@@ -2,18 +2,14 @@
   "name": "udes-cli",
   "version": "0.1.0",
   "description": "Utility fonctions to use in npm script",
-  "main": "index.js",
   "dependencies": {
     "cpx": "^1.5.0",
     "inline-source-cli": "^1.2.0",
     "replace-in-file": "^2.5.3"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
-    "polymer-build-dev": "bin/polymer/polymer-build-dev.js",
     "polymer-build": "bin/polymer/polymer-build.js",
+    "polymer-build-dev": "bin/polymer/polymer-build-dev.js",
     "polymer-build-test": "bin/polymer/polymer-build-test.js"
   },
   "repository": {
