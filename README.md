@@ -17,4 +17,17 @@ In your package.json script section
 ## Scripts
 `"scripts": {
     "build-dev": "polymer-build", ...}`
+    
+# Conventions
+## organization of code
+* The script (bin) must be place under bin and in a sub folder for related utils
+Ex. Polymer utils
+
+`bin/polymer/polymer-build.js`
+
+* The scr folder muste content the code executed by the script following a similar structure
+Ex. Polymer
+
+`src/polymer/index.js`
+
 
