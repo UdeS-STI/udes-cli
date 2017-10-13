@@ -10,7 +10,7 @@
     "yargs": "9.0.1"
   },
   "bin": {
-    "polymer-build": "bin/polymer/polymer-build.js",
+    "polymer-build": "bin/polymer/polymer-build.js"
   },
   "repository": {
     "type": "git",
