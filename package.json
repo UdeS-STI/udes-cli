@@ -11,8 +11,6 @@
   },
   "bin": {
     "polymer-build": "bin/polymer/polymer-build.js",
-    "polymer-build-dev": "bin/polymer/polymer-build-dev.js",
-    "polymer-build-test": "bin/polymer/polymer-build-test.js"
   },
   "repository": {
     "type": "git",
