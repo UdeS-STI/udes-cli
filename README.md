@@ -16,7 +16,10 @@ declare in the bin section of its package.json are available.
 In your package.json script section
 ## Scripts
 `"scripts": {
-    "build-dev": "polymer-build", ...}`
+    "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev", ...}`
+
+## On command line
+`npm run poylmer-build-dev -- --rootURI /~CIP/inscription-fcnc/`   
     
 # Conventions
 ## organization of code
