@@ -8,10 +8,10 @@
  *
  *      -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  *
- * @param {boolean} -addBuildDir (optional)
+ * @param {boolean} -rewriteBuildDev (optional)
  * Bla bla
  *
- *      -addBuildDir=true
+ *      -rewriteBuildDev=true
  *
  * @param {string} -buildFolder (optional)
  * Par défaut : 'build/'
@@ -44,7 +44,7 @@ let dir = "build/";
 let devdir;
 let listeNomsBuild = [];
 let debug = true;
-let rewriteSansDossierBuild = true;
+let rewriteBuildDev = false;
 
 
 function formatDir(dir) {
@@ -75,17 +75,17 @@ function validerLesArguments (argv) {
     const valeur = splitted[1];
 
     switch (cle) {
-      case '-addBuildDir' :
-        rewriteSansDossierBuild = false;
+      case '-rewriteBuildDev' :
+        rewriteBuildDev = true;
         if (debug) {
-          console.log("\t.htaccess Rewrite sans dossier du build: " + rewriteSansDossierBuild + "\n");
+          console.log("\t.htaccess Rewrite sans dossier du build: " + rewriteBuildDev + "\n");
         }
         break;
       case '-rootURI' :
         devdir = formatDir(valeur);
         break;
       case '-buildName' :
-        // TODO
+        listeNomsBuild = valeur.split(',');
         break;
       case '-buildFolder' :
         dir = formatDir(valeur);
@@ -99,7 +99,7 @@ function validerLesArguments (argv) {
 
   if (!listeNomsBuild.length) {
     // valeurs par défaut
-    listeNomsBuild = ['bundled', 'unbundled'];
+    //listeNomsBuild = ['bundled', 'unbundled', 'es5-bundled'];
   }
 }
 
@@ -129,7 +129,7 @@ function remplacementRewriteHtaccess (dossierDuBuild) {
   var changedFiles = replace.sync( {
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: "RewriteBase /" + devdir + (rewriteSansDossierBuild ? "" : dossierDuBuild)
+    to: "RewriteBase /" + devdir + (rewriteBuildDev ? dossierDuBuild : "")
   } );
   if ( changedFiles.length === 0 ) {
     throw ".htaccess non modifié";
