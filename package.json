@@ -1,6 +1,6 @@
 {
   "name": "udes-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Utility fonctions to use in npm script",
   "dependencies": {
     "cpx": "^1.5.0",
