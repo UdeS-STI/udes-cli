@@ -9,6 +9,13 @@
     "shelljs": "0.7.8",
     "yargs": "9.0.1"
   },
+  "devDependencies": {
+    "babel-eslint": "^8.0.1",
+    "eslint-config-udes": "^0.1.5"
+  },
+  "scripts": {
+    "lint": "eslint ./src"
+  },
   "bin": {
     "polymer-build": "bin/polymer/polymer-build.js"
   },
