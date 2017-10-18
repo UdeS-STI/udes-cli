@@ -1,36 +1,57 @@
 UdeS CLI
-======================
+========
+
+[![npm](https://img.shields.io/npm/v/udes-cli.svg?style=flat-square)](https://www.npmjs.com/package/udes-cli)
 
 # Introduction
-This package is used for npm script. You include the package via your package.json dependencies and all the script 
-declare in the bin section of its package.json are available.
-
+This package contains Command Line Interface tools for automated certain
+development tasks. Once installed the included scripts can be added to your `package.json`.
 
 # Getting started
-## Include in package.json dependencies
-`"dependencies": {...
-"udes-cli": "0.0.0",
-...}`
+## Installation
+```bash
+npm install udes-cli
+```
+
+## Add to project
+In the `script` section of your `package.json`
+```json
+"scripts": {
+  "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev"
+}
+```
 
 # Usage
-In your package.json script section
-## Scripts
-`"scripts": {
-    "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev", ...}`
+## Command Line
+```bash
+npm run polymer-build-dev -- --rootURI /path/to/project
+``` 
 
-## On command line
-`npm run poylmer-build-dev -- --rootURI /~CIP/inscription-fcnc/`   
-    
-# Conventions
-## organization of code
-* The script (bin) must be place under bin and in a sub folder for related utils
-Ex. Polymer utils
+# Documentation
+TODO
 
-`bin/polymer/polymer-build.js`
+# Contributing
+## Structure
+```
+.
+├── bin
+|   └── polymer
+|       └── polymer scripts
+├── dist
+|   └── transpiled (es5) source files
+└── src
+    └── polymer
+        └── polymer source files
+```
+* Scripts must be added to `bin` directory in a related sub-directory.
+* Source files must be added to the `src` directory.
+* The `dist` directory contains files built from `babel-cli`.
 
-* The scr folder muste content the code executed by the script following a similar structure
-Ex. Polymer
+## Style
+You must use the following guides:
+* [UdeS JavaScript Style Guide](https://www.npmjs.com/package/eslint-config-udes)
+* [StandardJS](https://standardjs.com/)
+* [JSdoc](http://usejsdoc.org/)
 
-`src/polymer/index.js`
-
-
+This project contains a linting config, you should setup `eslint` into your
+editors with `.eslintrc.js`.

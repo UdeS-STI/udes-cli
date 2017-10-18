@@ -1,203 +1,226 @@
-/**
- * Created by fgam2701 on 2017-07-19.
- *
- * Arguments :
- *
- * @param {string} -rootURI
- * Bla bla
- *
- *      -rootURI='~webv9201/nsquart2/inscription-fcnc/'
- *
- * @param {boolean} -rewriteBuildDev (optional)
- * Bla bla
- *
- *      -rewriteBuildDev=true
- *
- * @param {string} -buildFolder (optional)
- * Par défaut : 'build/'
- *
- *      -buildFolder='output/'
- *
- * // TODO
- * @param {string} -buildName (optional)
- * Par défaut : -buildName=bundled et -buildName=unbundled
- *
- * # Exemple :
- *
- *      node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
- *
- *      npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
- *
- */
-console.log("");
+import cpx from 'cpx'
+import fs from 'fs'
+import replace from 'replace-in-file'
+import inline from 'inline-source'
+import path from 'path'
 
-const cpx = require("cpx");
-const fs = require('fs');
-const replace = require("replace-in-file");
-const inline = require('inline-source');
-const path = require('path');
+const debug = true
 
-const NOM_ARGUMENT_POUR_REWRITE_SANS_DOSSIER_BUILD = "noBuildDir";
+const loggerType = {
+  DEBUG: {
+    title: '=============== DEBUG ===============\n',
+    color: '\x1b[34m',
+  },
+  ERROR: {
+    title: '=============== ERROR ===============\n',
+    color: '\x1b[31m',
+  },
+  RESET: '\x1b[0m',
+}
 
-// arguments
-let dir = "build/";
-let devdir;
-let listeNomsBuild = [];
-let debug = true;
-let rewriteBuildDev = false;
+const getLogArguments = (type, ...args) => {
+  const argumentList = args.map(arg => typeof arg === 'object' ? arg : `${arg}\n`)
+  argumentList.unshift(loggerType[type].title)
+  argumentList.unshift(loggerType[type].color)
+  argumentList.push('\x1b[0m')
+  return argumentList
+}
 
-
-function formatDir(dir) {
-  if ( !dir.endsWith( '/' ) ) {
-    dir += "/";
-  }
-  if ( dir.startsWith( '/' ) ) {
-    dir = dir.substr( 1, dir.length - 1 );
-  }
-  if (debug) {
-    console.log( "\tdir: " + dir );
-  }
-  return dir;
+const logger = {
+  ...console,
+  debug: (...args) => debug && console.log(...getLogArguments('DEBUG', ...args)),
+  error: (...args) => console.log(...getLogArguments('ERROR', ...args)),
 }
 
 /**
- *
- * @param arguments
+ * Ensures that the directory is in a standard format.
+ * @param {String} directory - A directory path.
+ * @returns {String} Properly formatted directory (dir/example/).
  */
-function validerLesArguments (argv) {
-  if (debug) {
-    console.log("argv", argv);
+const formatDir = (directory) => {
+  const dir = directory.replace(/^\//, '').replace(/([^/])$/, '$&/')
+  logger.debug(`\tdir: ${dir}`)
+  return dir
+}
+
+/**
+ * Converts command line arguments into a usable object.
+ * @param {[String]} argv - Arguments passed through command line.
+ * @returns {Object} Arguments in a formatted object.
+ */
+const getArguments = (argv) => {
+  logger.debug('argv', argv)
+  const defaultArgs = {
+    dir: 'build/',
+    devdir: null,
+    buildNames: [],
+    rewriteBuildDev: false,
   }
 
-  argv.forEach(arg => {
-    const splitted = arg.split('=');
-    const cle = splitted[0];
-    const valeur = splitted[1];
+  const args = argv.reduce((acc, cur) => {
+    const { 0: key, 1: value } = cur.split('=')
 
-    switch (cle) {
+    switch (key) {
       case '-rewriteBuildDev' :
-        rewriteBuildDev = true;
-        if (debug) {
-          console.log("\t.htaccess Rewrite sans dossier du build: " + rewriteBuildDev + "\n");
-        }
-        break;
+        logger.debug('.htaccess Rewrite without build directory: true')
+        return { ...acc, rewriteBuildDev: true }
       case '-rootURI' :
-        devdir = formatDir(valeur);
-        break;
+        return { ...acc, devdir: formatDir(value) }
       case '-buildName' :
-        listeNomsBuild = valeur.split(',');
-        break;
+        return { ...acc, buildNames: value.split(',') }
       case '-buildFolder' :
-        dir = formatDir(valeur);
-        break;
+        return { ...acc, dir: formatDir(value) }
     }
-  });
+  }, {})
 
-  if (!devdir) {
-    throw "argument `-rootURI` non défini";
+  if (!args.devdir) {
+    throw new Error('Undefined argument `-rootURI`')
   }
 
-  if (!listeNomsBuild.length) {
-    // valeurs par défaut
-    //listeNomsBuild = ['bundled', 'unbundled', 'es5-bundled'];
+  if (!args.buildNames.length) {
+    delete args.buildNames
   }
+
+  return { ...defaultArgs, ...args }
 }
 
-function copieHtaccess (dossierDuBuild) {
-  const sourceHtaccess = "htaccess.sample";
-  const htaccessSample = dossierDuBuild + "/" + sourceHtaccess;
-  const htaccess = dossierDuBuild + '/.htaccess';
+/**
+ * Copy sample htaccess file to the build directory.
+ * @param {String} buildDir - Location of build directory.
+ * @throws {Error} If copy fails.
+ */
+const copyHtaccess = (buildDir) => {
+  const sourceHtaccess = 'htaccess.sample'
+  const htaccessSample = `${buildDir}/${sourceHtaccess}`
+  const htaccess = `${buildDir}/.htaccess`
 
-  if ( !fs.existsSync( sourceHtaccess ) ) {
-    throw "Erreur, Le fichier " + sourceHtaccess + " n'existe pas.";
+  if (!fs.existsSync(sourceHtaccess)) {
+    throw new Error(`Error, file ${sourceHtaccess} not found.`)
   }
 
-  console.log( "\tcopie de .htaccess.sample vers " + dossierDuBuild + "..." );
-  cpx.copySync( sourceHtaccess, dossierDuBuild );
-  console.log( "\trenommer de " + htaccessSample + " vers " + htaccess + "..." );
-  fs.renameSync( htaccessSample, htaccess);
-  if ( !fs.existsSync( htaccess ) ) {
-    throw "Erreur, Le fichier " + htaccess + " n'existe pas";
+  logger.log(`Copy of .htaccess.sample to ${buildDir}...`)
+  cpx.copySync(sourceHtaccess, buildDir)
+
+  logger.log(`Rename ${htaccessSample} to ${htaccess}...`)
+  fs.renameSync(htaccessSample, htaccess)
+
+  if (!fs.existsSync(htaccess)) {
+    throw new Error(`Error, file ${htaccess} not found`)
   }
-  console.log( "\trenommer ok!\n" );
+
+  logger.log('Rename completed!')
 }
 
-function remplacementRewriteHtaccess (dossierDuBuild) {
-  var htaccess = dossierDuBuild + '/.htaccess';
+/**
+ * Update RewriteBase info in htaccess file.
+ * @param {String} buildDir - Location of build directory.
+ * @param {Object} args - Command line arguments.
+ * @param {String} args.devdir -Build directory
+ * @param {Boolean} args.rewriteBuildDev - If true rewrite of htaccess for build directory
+ * @throws {Error} If fails to update htaccess file.
+ */
+const replaceRewriteHtaccess = (buildDir, { devdir, rewriteBuildDev }) => {
+  const htaccess = `${buildDir}/.htaccess`
 
-  console.log( "\tRemplacer le RewriteBase de %s ...", htaccess);
-  var changedFiles = replace.sync( {
+  logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
+  const changedFiles = replace.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: "RewriteBase /" + devdir + (rewriteBuildDev ? dossierDuBuild : "")
-  } );
-  if ( changedFiles.length === 0 ) {
-    throw ".htaccess non modifié";
+    to: `RewriteBase /${devdir}${rewriteBuildDev ? buildDir : ''}`,
+  })
+
+  if (!changedFiles.length) {
+    throw new Error('.htaccess not modified')
   }
-  console.log( "\t.htaccess modifié!\n");
+
+  logger.log('.htaccess modified!')
 }
 
-function modifierMetaBaseIndex (dossierDuBuild) {
-  var index = dossierDuBuild + "/_index.html";
+/**
+ * update meta tags in index files.
+ * @param {String} buildDir - Location of build directory.
+ */
+const modifyMetaBaseIndex = (buildDir) => {
+  const index = `${buildDir}/_index.html`
 
-  console.log( "\tRemplacer le <meta base> de %s ...", index);
-  var changedFiles = replace.sync( {
+  logger.log(`Replace <meta base> of ${index}...`)
+  const changedFiles = replace.sync({
     files: index,
-    from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#\/]*/,
-    to: "base href=\"/" //pour l'exécution en local, ne change rien dans l'environnement de dev.
-  } );
-  console.log( "\t_index.html modifié: %s \n", changedFiles.length > 0 );
+    from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#/]*/,
+    to: 'base href="/', // For local execution only.
+  })
+
+  logger.log(`_index.html modified: ${!!changedFiles.length}`)
 }
 
-function modifierInlineIndex (dossierDuBuild) {
-  var htaccess = dossierDuBuild + '/.htaccess',
-    index = dossierDuBuild + "/_index.html";
+/**
+ * Update src tags in index files.
+ * @param {String} buildDir - Location of build directory.
+ * @throws {Error} If no files are updated.
+ */
+const modifyInlineIndex = (buildDir) => {
+  const index = `${buildDir}/_index.html`
 
-  console.log( "\tRemplacer les <src inline=\"\"> par <src inline> dans %s ...", index);
-  var changedFiles = replace.sync( {
+  logger.log(`Replace <src inline=""> with <src inline> in ${index}...`)
+  const changedFiles = replace.sync({
     files: index,
     from: /inline=""/g,
-    to: "inline"
-  } );
-  if ( changedFiles.length === 0 ) {
-    throw "Aucun remplacement de « inline=\"\" » dans " + index;
+    to: 'inline',
+  })
+
+  if (!changedFiles.length) {
+    throw new Error(`No replacement of « inline="" » in ${index}`)
   }
-  console.log( "\tRemplacer <src inline> Ok!\n" );
+
+  logger.log(`Replace <src inline> Ok!`)
 }
 
-function compresserInlineIndex (dossierDuBuild) {
-  var index = dossierDuBuild + "/_index.html";
+/**
+ * Minify and compress src tags in index files.
+ * @param {String} buildDir - Location of build directory.
+ * @throws {Error} If no file is compressed.
+ */
+const compressInlineIndex = (buildDir) => {
+  const index = `${buildDir}/_index.html`
 
-  console.log( "\tMettre inline et compresser les <src inline> dans %s ...", index);
-  var html = inline.sync(path.resolve(index), {
+  logger.log(`Minify and compress <src inline> in ${index}...`)
+  const html = inline.sync(path.resolve(index), {
     compress: true,
-    rootpath: path.resolve('./')
-  });
-  if(!html) {
-    throw ".htaccess non compressé";
+    rootpath: path.resolve('./'),
+  })
+
+  if (!html) {
+    throw new Error(`${index} not compressed`)
   }
-  console.log( "\tMettre inline et compresser les <src inline> Ok!\n" );
+
+  logger.log('Minify and compress <src inline> Ok!')
 }
 
+/**
+ * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
+ * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
+ * @param {String} [-buildFolder='build/'] - Build directory
+ * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
+ * @exemple
+ * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
+ * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
+ */
 try {
-  validerLesArguments(process.argv);
+  const args = getArguments(process.argv)
 
-  listeNomsBuild.forEach(nomBuild => {
-    var dossierDuBuild = dir + nomBuild;
-    console.log("dossierDuBuild : ", dossierDuBuild);
+  args.buildNames.forEach((buildName) => {
+    const buildDir = `${args.dir}${buildName}`
+    logger.log(`Build directory: ${buildDir}`)
 
-    copieHtaccess(dossierDuBuild);
-    remplacementRewriteHtaccess(dossierDuBuild);
-    modifierMetaBaseIndex(dossierDuBuild);
-    modifierInlineIndex(dossierDuBuild);
-    compresserInlineIndex(dossierDuBuild);
-  });
+    copyHtaccess(buildDir)
+    replaceRewriteHtaccess(buildDir, args)
+    modifyMetaBaseIndex(buildDir)
+    modifyInlineIndex(buildDir)
+    compressInlineIndex(buildDir)
+  })
 
-  process.exit(0);
+  process.exit(0)
 } catch (error) {
-  console.error("\033[1;31m \n\n===========\n" +
-    "ERREUR!!!!\n" +
-    "%s\n" +
-    "===============\n", error);
-  process.exit(1);
+  logger.error(error)
+  process.exit(1)
 }
