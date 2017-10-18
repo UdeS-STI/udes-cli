@@ -9,7 +9,7 @@ const argv = require('yargs')
   .option('buildName', {
     alias: 'b',
     describe: 'Choose a build',
-    choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled'],
+    choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
     type: 'array',
   })
   .option('rootURI', {

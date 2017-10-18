@@ -4,33 +4,7 @@ import replace from 'replace-in-file'
 import inline from 'inline-source'
 import path from 'path'
 
-const debug = true
-
-const loggerType = {
-  DEBUG: {
-    title: '=============== DEBUG ===============\n',
-    color: '\x1b[34m',
-  },
-  ERROR: {
-    title: '=============== ERROR ===============\n',
-    color: '\x1b[31m',
-  },
-  RESET: '\x1b[0m',
-}
-
-const getLogArguments = (type, ...args) => {
-  const argumentList = args.map(arg => typeof arg === 'object' ? arg : `${arg}\n`)
-  argumentList.unshift(loggerType[type].title)
-  argumentList.unshift(loggerType[type].color)
-  argumentList.push('\x1b[0m')
-  return argumentList
-}
-
-const logger = {
-  ...console,
-  debug: (...args) => debug && console.log(...getLogArguments('DEBUG', ...args)),
-  error: (...args) => console.log(...getLogArguments('ERROR', ...args)),
-}
+import { getArguments, logger } from '../lib/utils'
 
 /**
  * Ensures that the directory is in a standard format.
@@ -45,43 +19,27 @@ const formatDir = (directory) => {
 
 /**
  * Converts command line arguments into a usable object.
- * @param {[String]} argv - Arguments passed through command line.
+ * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
-const getArguments = (argv) => {
-  logger.debug('argv', argv)
-  const defaultArgs = {
-    dir: 'build/',
-    devdir: null,
-    buildNames: [],
-    rewriteBuildDev: false,
-  }
-
-  const args = argv.reduce((acc, cur) => {
-    const { 0: key, 1: value } = cur.split('=')
-
-    switch (key) {
-      case '-rewriteBuildDev' :
-        logger.debug('.htaccess Rewrite without build directory: true')
-        return { ...acc, rewriteBuildDev: true }
-      case '-rootURI' :
-        return { ...acc, devdir: formatDir(value) }
-      case '-buildName' :
-        return { ...acc, buildNames: value.split(',') }
-      case '-buildFolder' :
-        return { ...acc, dir: formatDir(value) }
-    }
-  }, {})
-
-  if (!args.devdir) {
+const formatArguments = (args) => {
+  if (!args.rootURI) {
     throw new Error('Undefined argument `-rootURI`')
   }
 
-  if (!args.buildNames.length) {
-    delete args.buildNames
-  }
+  const {
+    buildFolder = 'build/',
+    buildName = ['bundled', 'unbundled', 'es5-bundled'],
+    rootURI,
+    rewriteBuildDev,
+  } = args
 
-  return { ...defaultArgs, ...args }
+  return {
+    dir: formatDir(buildFolder),
+    devdir: formatDir(rootURI),
+    rewriteBuildDev,
+    buildNames: buildName,
+  }
 }
 
 /**
@@ -201,12 +159,12 @@ const compressInlineIndex = (buildDir) => {
  * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
  * @param {String} [-buildFolder='build/'] - Build directory
  * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
- * @exemple
+ * @example
  * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  */
 try {
-  const args = getArguments(process.argv)
+  const args = formatArguments(getArguments())
 
   args.buildNames.forEach((buildName) => {
     const buildDir = `${args.dir}${buildName}`
