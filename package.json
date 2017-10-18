@@ -10,11 +10,15 @@
     "yargs": "9.0.1"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "eslint-config-udes": "^0.1.5"
   },
   "scripts": {
-    "lint": "eslint ./src"
+    "build": "babel ./src --out-dir dist",
+    "lint": "eslint ./src; eslint ./bin"
   },
   "bin": {
     "polymer-build": "bin/polymer/polymer-build.js"

@@ -1,6 +1,5 @@
 #! /usr/bin/env node
-import shell from 'shelljs'
-
+const shell = require('shelljs')
 const argv = require('yargs')
   .usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
   .option('rewriteBuildDev', {
@@ -25,7 +24,7 @@ const argv = require('yargs')
   .argv
 
 if (argv.rewriteBuildDev) {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/src/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
+  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
 } else {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/src/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
+  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
 }
