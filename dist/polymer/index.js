@@ -1,9 +1,5 @@
 'use strict';
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _cpx = require('cpx');
 
 var _cpx2 = _interopRequireDefault(_cpx);
@@ -24,110 +20,45 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
+var _utils = require('../lib/utils');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var _debug = true;
-
-var loggerType = {
-  DEBUG: {
-    title: '=============== DEBUG ===============\n',
-    color: '\x1b[34m'
-  },
-  ERROR: {
-    title: '=============== ERROR ===============\n',
-    color: '\x1b[31m'
-  },
-  RESET: '\x1b[0m'
-};
-
-var getLogArguments = function getLogArguments(type) {
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  var argumentList = args.map(function (arg) {
-    return (typeof arg === 'undefined' ? 'undefined' : _typeof(arg)) === 'object' ? arg : arg + '\n';
-  });
-  argumentList.unshift(loggerType[type].title);
-  argumentList.unshift(loggerType[type].color);
-  argumentList.push('\x1b[0m');
-  return argumentList;
-};
-
-var logger = _extends({}, console, {
-  debug: function debug() {
-    var _console;
-
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
-    }
-
-    return _debug && (_console = console).log.apply(_console, _toConsumableArray(getLogArguments.apply(undefined, ['DEBUG'].concat(args))));
-  },
-  error: function error() {
-    var _console2;
-
-    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      args[_key3] = arguments[_key3];
-    }
-
-    return (_console2 = console).log.apply(_console2, _toConsumableArray(getLogArguments.apply(undefined, ['ERROR'].concat(args))));
-  }
-
-  /**
-   * Ensures that the directory is in a standard format.
-   * @param {String} directory - A directory path.
-   * @returns {String} Properly formatted directory (dir/example/).
-   */
-});var formatDir = function formatDir(directory) {
+/**
+ * Ensures that the directory is in a standard format.
+ * @param {String} directory - A directory path.
+ * @returns {String} Properly formatted directory (dir/example/).
+ */
+var formatDir = function formatDir(directory) {
   var dir = directory.replace(/^\//, '').replace(/([^/])$/, '$&/');
-  logger.debug('\tdir: ' + dir);
+  _utils.logger.debug('\tdir: ' + dir);
   return dir;
 };
 
 /**
  * Converts command line arguments into a usable object.
- * @param {[String]} argv - Arguments passed through command line.
+ * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
-var getArguments = function getArguments(argv) {
-  logger.debug('argv', argv);
-  var defaultArgs = {
-    dir: 'build/',
-    devdir: null,
-    buildNames: [],
-    rewriteBuildDev: false
-  };
-
-  var args = argv.reduce(function (acc, cur) {
-    var _cur$split = cur.split('='),
-        key = _cur$split[0],
-        value = _cur$split[1];
-
-    switch (key) {
-      case '-rewriteBuildDev':
-        logger.debug('.htaccess Rewrite without build directory: true');
-        return _extends({}, acc, { rewriteBuildDev: true });
-      case '-rootURI':
-        return _extends({}, acc, { devdir: formatDir(value) });
-      case '-buildName':
-        return _extends({}, acc, { buildNames: value.split(',') });
-      case '-buildFolder':
-        return _extends({}, acc, { dir: formatDir(value) });
-    }
-  }, {});
-
-  if (!args.devdir) {
+var formatArguments = function formatArguments(args) {
+  if (!args.rootURI) {
     throw new Error('Undefined argument `-rootURI`');
   }
 
-  if (!args.buildNames.length) {
-    delete args.buildNames;
-  }
+  var _args$buildFolder = args.buildFolder,
+      buildFolder = _args$buildFolder === undefined ? 'build/' : _args$buildFolder,
+      _args$buildName = args.buildName,
+      buildName = _args$buildName === undefined ? ['bundled', 'unbundled', 'es5-bundled'] : _args$buildName,
+      rootURI = args.rootURI,
+      rewriteBuildDev = args.rewriteBuildDev;
 
-  return _extends({}, defaultArgs, args);
+
+  return {
+    dir: formatDir(buildFolder),
+    devdir: formatDir(rootURI),
+    rewriteBuildDev: rewriteBuildDev,
+    buildNames: buildName
+  };
 };
 
 /**
@@ -144,17 +75,17 @@ var copyHtaccess = function copyHtaccess(buildDir) {
     throw new Error('Error, file ' + sourceHtaccess + ' not found.');
   }
 
-  logger.log('Copy of .htaccess.sample to ' + buildDir + '...');
+  _utils.logger.log('Copy of .htaccess.sample to ' + buildDir + '...');
   _cpx2.default.copySync(sourceHtaccess, buildDir);
 
-  logger.log('Rename ' + htaccessSample + ' to ' + htaccess + '...');
+  _utils.logger.log('Rename ' + htaccessSample + ' to ' + htaccess + '...');
   _fs2.default.renameSync(htaccessSample, htaccess);
 
   if (!_fs2.default.existsSync(htaccess)) {
     throw new Error('Error, file ' + htaccess + ' not found');
   }
 
-  logger.log('Rename completed!');
+  _utils.logger.log('Rename completed!');
 };
 
 /**
@@ -171,7 +102,7 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, _ref) {
 
   var htaccess = buildDir + '/.htaccess';
 
-  logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
+  _utils.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
   var changedFiles = _replaceInFile2.default.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
@@ -182,7 +113,7 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, _ref) {
     throw new Error('.htaccess not modified');
   }
 
-  logger.log('.htaccess modified!');
+  _utils.logger.log('.htaccess modified!');
 };
 
 /**
@@ -192,14 +123,14 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, _ref) {
 var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir) {
   var index = buildDir + '/_index.html';
 
-  logger.log('Replace <meta base> of ' + index + '...');
+  _utils.logger.log('Replace <meta base> of ' + index + '...');
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
     from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#/]*/,
     to: 'base href="/' // For local execution only.
   });
 
-  logger.log('_index.html modified: ' + !!changedFiles.length);
+  _utils.logger.log('_index.html modified: ' + !!changedFiles.length);
 };
 
 /**
@@ -210,7 +141,7 @@ var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir) {
 var modifyInlineIndex = function modifyInlineIndex(buildDir) {
   var index = buildDir + '/_index.html';
 
-  logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
+  _utils.logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
     from: /inline=""/g,
@@ -221,7 +152,7 @@ var modifyInlineIndex = function modifyInlineIndex(buildDir) {
     throw new Error('No replacement of \xAB inline="" \xBB in ' + index);
   }
 
-  logger.log('Replace <src inline> Ok!');
+  _utils.logger.log('Replace <src inline> Ok!');
 };
 
 /**
@@ -232,7 +163,7 @@ var modifyInlineIndex = function modifyInlineIndex(buildDir) {
 var compressInlineIndex = function compressInlineIndex(buildDir) {
   var index = buildDir + '/_index.html';
 
-  logger.log('Minify and compress <src inline> in ' + index + '...');
+  _utils.logger.log('Minify and compress <src inline> in ' + index + '...');
   var html = _inlineSource2.default.sync(_path2.default.resolve(index), {
     compress: true,
     rootpath: _path2.default.resolve('./')
@@ -242,7 +173,7 @@ var compressInlineIndex = function compressInlineIndex(buildDir) {
     throw new Error(index + ' not compressed');
   }
 
-  logger.log('Minify and compress <src inline> Ok!');
+  _utils.logger.log('Minify and compress <src inline> Ok!');
 };
 
 /**
@@ -250,16 +181,16 @@ var compressInlineIndex = function compressInlineIndex(buildDir) {
  * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
  * @param {String} [-buildFolder='build/'] - Build directory
  * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
- * @exemple
+ * @example
  * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  */
 try {
-  var args = getArguments(process.argv);
+  var args = formatArguments((0, _utils.getArguments)());
 
   args.buildNames.forEach(function (buildName) {
     var buildDir = '' + args.dir + buildName;
-    logger.log('Build directory: ' + buildDir);
+    _utils.logger.log('Build directory: ' + buildDir);
 
     copyHtaccess(buildDir);
     replaceRewriteHtaccess(buildDir, args);
@@ -270,6 +201,6 @@ try {
 
   process.exit(0);
 } catch (error) {
-  logger.error(error);
+  _utils.logger.error(error);
   process.exit(1);
 }
