@@ -17,7 +17,6 @@ npm install udes-cli
 In the `script` section of your `package.json`
 ```json
 "scripts": {
-  ...
   "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev"
 }
 ```
