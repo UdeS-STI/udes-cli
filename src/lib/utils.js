@@ -24,6 +24,10 @@ export const logger = {
   error: (...args) => console.log(...getLogArguments('ERROR', ...args)),
 }
 
+/**
+ * Converts the arguments array into a readable object.
+ * @returns {Object} An object containing the command line arguments.
+ */
 export const getArguments = () => process.argv.reduce((acc, arg) => {
   if (arg.includes('=') || /^-+\w+/.test(arg)) {
     const { 0: key, 1: value } = arg.split('=')
