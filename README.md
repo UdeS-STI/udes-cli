@@ -27,6 +27,9 @@ In the `script` section of your `package.json`
 npm run polymer-build-dev -- --rootURI /path/to/project
 ``` 
 
+# Documentation
+TODO
+
 # Contributing
 ## Structure
 ```
