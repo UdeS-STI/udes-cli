@@ -26,13 +26,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /**
  * Ensures that the directory is in a standard format.
- * @param {String} directory - A directory path.
+ * @param {String} dir - A directory path.
  * @returns {String} Properly formatted directory (dir/example/).
  */
-var formatDir = function formatDir(directory) {
-  var dir = directory.replace(/^\//, '').replace(/([^/])$/, '$&/');
-  _utils.logger.debug('\tdir: ' + dir);
-  return dir;
+var formatDir = function formatDir(dir) {
+  return dir.replace(/^\//, '').replace(/([^/])$/, '$&/');
 };
 
 /**
@@ -49,15 +47,19 @@ var formatArguments = function formatArguments(args) {
       buildFolder = _args$buildFolder === undefined ? 'build/' : _args$buildFolder,
       _args$buildName = args.buildName,
       buildName = _args$buildName === undefined ? ['bundled', 'unbundled', 'es5-bundled'] : _args$buildName,
-      rootURI = args.rootURI,
-      rewriteBuildDev = args.rewriteBuildDev;
+      rewriteBuildDev = args.rewriteBuildDev,
+      rootURI = args.rootURI;
 
+
+  if (rewriteBuildDev) {
+    _utils.logger.debug('.htaccess Rewrite without build directory: true');
+  }
 
   return {
-    dir: formatDir(buildFolder),
+    buildNames: buildName,
     devdir: formatDir(rootURI),
-    rewriteBuildDev: rewriteBuildDev,
-    buildNames: buildName
+    dir: formatDir(buildFolder),
+    rewriteBuildDev: rewriteBuildDev
   };
 };
 
@@ -91,15 +93,11 @@ var copyHtaccess = function copyHtaccess(buildDir) {
 /**
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
- * @param {Object} args - Command line arguments.
- * @param {String} args.devdir -Build directory
- * @param {Boolean} args.rewriteBuildDev - If true rewrite of htaccess for build directory
+ * @param {String} devdir -Build directory
+ * @param {Boolean} rewriteBuildDev - If true rewrite of htaccess for build directory
  * @throws {Error} If fails to update htaccess file.
  */
-var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, _ref) {
-  var devdir = _ref.devdir,
-      rewriteBuildDev = _ref.rewriteBuildDev;
-
+var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev) {
   var htaccess = buildDir + '/.htaccess';
 
   _utils.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
@@ -186,14 +184,18 @@ var compressInlineIndex = function compressInlineIndex(buildDir) {
  * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  */
 try {
-  var args = formatArguments((0, _utils.getArguments)());
+  var _formatArguments = formatArguments((0, _utils.getArguments)()),
+      buildNames = _formatArguments.buildNames,
+      devdir = _formatArguments.devdir,
+      dir = _formatArguments.dir,
+      rewriteBuildDev = _formatArguments.rewriteBuildDev;
 
-  args.buildNames.forEach(function (buildName) {
-    var buildDir = '' + args.dir + buildName;
+  buildNames.forEach(function (buildName) {
+    var buildDir = '' + dir + buildName;
     _utils.logger.log('Build directory: ' + buildDir);
 
     copyHtaccess(buildDir);
-    replaceRewriteHtaccess(buildDir, args);
+    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev);
     modifyMetaBaseIndex(buildDir);
     modifyInlineIndex(buildDir);
     compressInlineIndex(buildDir);

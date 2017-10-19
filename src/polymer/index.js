@@ -8,14 +8,10 @@ import { getArguments, logger } from '../lib/utils'
 
 /**
  * Ensures that the directory is in a standard format.
- * @param {String} directory - A directory path.
+ * @param {String} dir - A directory path.
  * @returns {String} Properly formatted directory (dir/example/).
  */
-const formatDir = (directory) => {
-  const dir = directory.replace(/^\//, '').replace(/([^/])$/, '$&/')
-  logger.debug(`\tdir: ${dir}`)
-  return dir
-}
+const formatDir = dir => dir.replace(/^\//, '').replace(/([^/])$/, '$&/')
 
 /**
  * Converts command line arguments into a usable object.
@@ -30,15 +26,19 @@ const formatArguments = (args) => {
   const {
     buildFolder = 'build/',
     buildName = ['bundled', 'unbundled', 'es5-bundled'],
-    rootURI,
     rewriteBuildDev,
+    rootURI,
   } = args
 
+  if (rewriteBuildDev) {
+    logger.debug('.htaccess Rewrite without build directory: true')
+  }
+
   return {
-    dir: formatDir(buildFolder),
-    devdir: formatDir(rootURI),
-    rewriteBuildDev,
     buildNames: buildName,
+    devdir: formatDir(rootURI),
+    dir: formatDir(buildFolder),
+    rewriteBuildDev,
   }
 }
 
@@ -72,12 +72,11 @@ const copyHtaccess = (buildDir) => {
 /**
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
- * @param {Object} args - Command line arguments.
- * @param {String} args.devdir -Build directory
- * @param {Boolean} args.rewriteBuildDev - If true rewrite of htaccess for build directory
+ * @param {String} devdir -Build directory
+ * @param {Boolean} rewriteBuildDev - If true rewrite of htaccess for build directory
  * @throws {Error} If fails to update htaccess file.
  */
-const replaceRewriteHtaccess = (buildDir, { devdir, rewriteBuildDev }) => {
+const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
   const htaccess = `${buildDir}/.htaccess`
 
   logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
@@ -164,14 +163,14 @@ const compressInlineIndex = (buildDir) => {
  * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
  */
 try {
-  const args = formatArguments(getArguments())
+  const { buildNames, devdir, dir, rewriteBuildDev } = formatArguments(getArguments())
 
-  args.buildNames.forEach((buildName) => {
-    const buildDir = `${args.dir}${buildName}`
+  buildNames.forEach((buildName) => {
+    const buildDir = `${dir}${buildName}`
     logger.log(`Build directory: ${buildDir}`)
 
     copyHtaccess(buildDir)
-    replaceRewriteHtaccess(buildDir, args)
+    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev)
     modifyMetaBaseIndex(buildDir)
     modifyInlineIndex(buildDir)
     compressInlineIndex(buildDir)
