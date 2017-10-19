@@ -5,19 +5,32 @@ UdeS CLI
 
 # Introduction
 This package contains Command Line Interface tools for automated certain
-development tasks. Once installed the included scripts can be added to your `package.json`.
+development tasks. Once installed the included scripts can be added to your
+`package.json`.
 
 # Getting started
 ## Installation
+If you want to test or develop on the library simply urn these commands
+```bash
+git clone git@github.com:UdeS-STI/udes-cli.git
+cd udes-cli
+npm install
+# Allows using the CLI directly within the package for testing.
+ln -s `pwd` node_modules/udes-cli
+```
+
+## Add to project
+If you want to add the library to your project simply run
 ```bash
 npm install udes-cli
 ```
 
-## Add to project
-In the `script` section of your `package.json`
+Then, in the `script` section of your `package.json` you can add the commands
+from the library
 ```json
 "scripts": {
-  "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev"
+  "polymer-build-dev": "polymer-build --buildName=bundled --rewriteBuildDev",
+  "polymer-build": "polymer-build --buildName=es6-bundled"
 }
 ```
 
