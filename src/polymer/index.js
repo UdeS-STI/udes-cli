@@ -113,21 +113,16 @@ const modifyMetaBaseIndex = (buildDir) => {
 /**
  * Update src tags in index files.
  * @param {String} buildDir - Location of build directory.
- * @throws {Error} If no files are updated.
  */
 const modifyInlineIndex = (buildDir) => {
   const index = `${buildDir}/_index.html`
 
   logger.log(`Replace <src inline=""> with <src inline> in ${index}...`)
-  const changedFiles = replace.sync({
+  replace.sync({
     files: index,
     from: /inline=""/g,
     to: 'inline',
   })
-
-  if (!changedFiles.length) {
-    throw new Error(`No replacement of « inline="" » in ${index}`)
-  }
 
   logger.log(`Replace <src inline> Ok!`)
 }
