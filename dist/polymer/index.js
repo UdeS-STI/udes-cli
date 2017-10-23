@@ -43,10 +43,22 @@ var formatArguments = function formatArguments(args) {
     throw new Error('Undefined argument `-rootURI`');
   }
 
-  var _args$buildFolder = args.buildFolder,
-      buildFolder = _args$buildFolder === undefined ? 'build/' : _args$buildFolder,
-      _args$buildName = args.buildName,
-      buildName = _args$buildName === undefined ? ['bundled', 'unbundled', 'es5-bundled'] : _args$buildName,
+  var dir = formatDir(args.buildFolder || 'build/');
+  var defaultBuildNames = void 0;
+
+  try {
+    var polymerConfig = JSON.parse(_fs2.default.readFileSync(dir + 'polymer.json'));
+    defaultBuildNames = polymerConfig.builds.map(function (_ref) {
+      var name = _ref.name,
+          preset = _ref.preset;
+      return name || preset;
+    });
+  } catch (err) {
+    defaultBuildNames = ['bundled', 'unbundled', 'es5-bundled'];
+  }
+
+  var _args$buildName = args.buildName,
+      buildName = _args$buildName === undefined ? defaultBuildNames : _args$buildName,
       rewriteBuildDev = args.rewriteBuildDev,
       rootURI = args.rootURI;
 
@@ -58,7 +70,7 @@ var formatArguments = function formatArguments(args) {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: formatDir(buildFolder),
+    dir: dir,
     rewriteBuildDev: rewriteBuildDev
   };
 };
@@ -134,21 +146,16 @@ var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir) {
 /**
  * Update src tags in index files.
  * @param {String} buildDir - Location of build directory.
- * @throws {Error} If no files are updated.
  */
 var modifyInlineIndex = function modifyInlineIndex(buildDir) {
   var index = buildDir + '/_index.html';
 
   _utils.logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
-  var changedFiles = _replaceInFile2.default.sync({
+  _replaceInFile2.default.sync({
     files: index,
     from: /inline=""/g,
     to: 'inline'
   });
-
-  if (!changedFiles.length) {
-    throw new Error('No replacement of \xAB inline="" \xBB in ' + index);
-  }
 
   _utils.logger.log('Replace <src inline> Ok!');
 };
