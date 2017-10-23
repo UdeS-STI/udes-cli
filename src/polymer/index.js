@@ -23,9 +23,18 @@ const formatArguments = (args) => {
     throw new Error('Undefined argument `-rootURI`')
   }
 
+  const dir = formatDir(args.buildFolder || 'build/')
+  let defaultBuildNames
+
+  try {
+    const polymerConfig = JSON.parse(fs.readFileSync(`${dir}polymer.json`))
+    defaultBuildNames = polymerConfig.builds.map(({ name, preset }) => name || preset)
+  } catch (err) {
+    defaultBuildNames = ['bundled', 'unbundled', 'es5-bundled']
+  }
+
   const {
-    buildFolder = 'build/',
-    buildName = ['bundled', 'unbundled', 'es5-bundled'],
+    buildName = defaultBuildNames,
     rewriteBuildDev,
     rootURI,
   } = args
@@ -37,7 +46,7 @@ const formatArguments = (args) => {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: formatDir(buildFolder),
+    dir,
     rewriteBuildDev,
   }
 }
