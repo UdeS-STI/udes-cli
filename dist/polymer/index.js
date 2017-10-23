@@ -44,6 +44,7 @@ var formatArguments = function formatArguments(args) {
   }
 
   var defaultBuildNames = void 0;
+  var dir = 'build/';
 
   try {
     var polymerConfig = JSON.parse(_fs2.default.readFileSync(dir + 'polymer.json'));
@@ -69,7 +70,7 @@ var formatArguments = function formatArguments(args) {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: 'build',
+    dir: dir,
     rewriteBuildDev: rewriteBuildDev
   };
 };
@@ -192,11 +193,11 @@ try {
   var _formatArguments = formatArguments((0, _utils.getArguments)()),
       buildNames = _formatArguments.buildNames,
       devdir = _formatArguments.devdir,
-      _dir = _formatArguments.dir,
+      dir = _formatArguments.dir,
       rewriteBuildDev = _formatArguments.rewriteBuildDev;
 
   buildNames.forEach(function (buildName) {
-    var buildDir = '' + _dir + buildName;
+    var buildDir = '' + dir + buildName;
     _utils.logger.log('Build directory: ' + buildDir);
 
     copyHtaccess(buildDir);

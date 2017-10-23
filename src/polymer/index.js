@@ -24,6 +24,7 @@ const formatArguments = (args) => {
   }
 
   let defaultBuildNames
+  const dir = 'build/'
 
   try {
     const polymerConfig = JSON.parse(fs.readFileSync(`${dir}polymer.json`))
@@ -45,7 +46,7 @@ const formatArguments = (args) => {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: 'build',
+    dir,
     rewriteBuildDev,
   }
 }
