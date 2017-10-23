@@ -43,7 +43,6 @@ var formatArguments = function formatArguments(args) {
     throw new Error('Undefined argument `-rootURI`');
   }
 
-  var dir = formatDir(args.buildFolder || 'build/');
   var defaultBuildNames = void 0;
 
   try {
@@ -70,7 +69,7 @@ var formatArguments = function formatArguments(args) {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: dir,
+    dir: 'build/',
     rewriteBuildDev: rewriteBuildDev
   };
 };
@@ -184,7 +183,6 @@ var compressInlineIndex = function compressInlineIndex(buildDir) {
 /**
  * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
  * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
- * @param {String} [-buildFolder='build/'] - Build directory
  * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
  * @example
  * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
@@ -194,11 +192,11 @@ try {
   var _formatArguments = formatArguments((0, _utils.getArguments)()),
       buildNames = _formatArguments.buildNames,
       devdir = _formatArguments.devdir,
-      dir = _formatArguments.dir,
+      _dir = _formatArguments.dir,
       rewriteBuildDev = _formatArguments.rewriteBuildDev;
 
   buildNames.forEach(function (buildName) {
-    var buildDir = '' + dir + buildName;
+    var buildDir = '' + _dir + buildName;
     _utils.logger.log('Build directory: ' + buildDir);
 
     copyHtaccess(buildDir);

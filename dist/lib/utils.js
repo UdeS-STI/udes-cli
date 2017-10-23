@@ -69,7 +69,7 @@ var logger = exports.logger = _extends({}, console, {
           key = _arg$split[0],
           value = _arg$split[1];
 
-      return _extends({}, acc, _defineProperty({}, key.replace(/^-+/, ''), value || true));
+      return value === 'undefined' ? acc : _extends({}, acc, _defineProperty({}, key.replace(/^-+/, ''), value || true));
     }
 
     return acc;

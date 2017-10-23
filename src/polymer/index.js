@@ -23,7 +23,6 @@ const formatArguments = (args) => {
     throw new Error('Undefined argument `-rootURI`')
   }
 
-  const dir = formatDir(args.buildFolder || 'build/')
   let defaultBuildNames
 
   try {
@@ -46,7 +45,7 @@ const formatArguments = (args) => {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir,
+    dir: 'build/',
     rewriteBuildDev,
   }
 }
@@ -160,7 +159,6 @@ const compressInlineIndex = (buildDir) => {
 /**
  * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
  * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
- * @param {String} [-buildFolder='build/'] - Build directory
  * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
  * @example
  * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
