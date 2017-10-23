@@ -69,7 +69,7 @@ var formatArguments = function formatArguments(args) {
   return {
     buildNames: buildName,
     devdir: formatDir(rootURI),
-    dir: 'build/',
+    dir: 'build',
     rewriteBuildDev: rewriteBuildDev
   };
 };
