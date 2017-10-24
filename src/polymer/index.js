@@ -84,14 +84,15 @@ const copyHtaccess = (buildDir) => {
  * @param {String} devdir -Build directory
  * @throws {Error} If fails to update htaccess file.
  */
-const replaceRewriteHtaccess = (buildDir, devdir) => {
+const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
   const htaccess = `${buildDir}/.htaccess`
+  const to = (rewriteBuildDev) ? `RewriteBase /${devdir}${buildDir}` : `RewriteBase /${devdir}`
 
   logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
   const changedFiles = replace.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: `RewriteBase /${devdir}${buildDir}`,
+    to: to
   })
 
   if (!changedFiles.length) {
@@ -171,11 +172,8 @@ try {
     const buildDir = `${dir}${buildName}`
     logger.log(`Build directory: ${buildDir}`)
 
-    if (rewriteBuildDev) {
-      copyHtaccess(buildDir)
-      replaceRewriteHtaccess(buildDir, devdir)
-    }
-
+    copyHtaccess(buildDir)
+    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev)
     modifyMetaBaseIndex(buildDir, devdir)
     modifyInlineIndex(buildDir)
     compressInlineIndex(buildDir)
