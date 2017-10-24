@@ -113,7 +113,7 @@ const modifyMetaBaseIndex = (buildDir, devdir) => {
   const changedFiles = replace.sync({
     files: index,
     from: /base\shref="\/"/, // For local execution only.
-    to: `https://www.usherbrooke.ca/${devdir}`,
+    to: `base href="https://www.usherbrooke.ca/${devdir}"`,
   })
 
   logger.log(`_index.html modified: ${!!changedFiles.length}`)

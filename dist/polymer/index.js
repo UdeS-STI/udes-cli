@@ -137,7 +137,7 @@ var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir, devdir) {
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
     from: /base\shref="\/"/, // For local execution only.
-    to: 'https://www.usherbrooke.ca/' + devdir
+    to: 'base href="https://www.usherbrooke.ca/' + devdir + '"'
   });
 
   _utils.logger.log('_index.html modified: ' + !!changedFiles.length);
