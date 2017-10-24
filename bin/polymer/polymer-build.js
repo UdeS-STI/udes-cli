@@ -9,7 +9,7 @@ const argv = require('yargs')
   .option('buildName', {
     alias: 'b',
     describe: 'Choose a build',
-    choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled'],
+    choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
     type: 'array',
   })
   .option('rootURI', {
@@ -18,13 +18,12 @@ const argv = require('yargs')
   })
   .array('buildName')
   .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
-  .default('buildName', 'bundled')
   .help('h')
   .alias('h', 'help')
   .argv
 
 if (argv.rewriteBuildDev) {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
+  shell.exec(`polymer build && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
 } else {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
+  shell.exec(`polymer build && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
 }

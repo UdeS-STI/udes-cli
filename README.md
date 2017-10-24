@@ -1,13 +1,14 @@
 UdeS CLI
 ========
 
-[![CircleCI](https://circleci.com/gh/UdeS-STI/udes-cli/tree/master.svg?style=svg&circle-token=04015d40678b6aab6829a79ca2951bd9dccf7808)](https://circleci.com/gh/UdeS-STI/udes-cli/tree/master)
+[![CircleCI](https://circleci.com/gh/UdeS-STI/udes-cli.svg?style=svg)](https://circleci.com/gh/UdeS-STI/udes-cli)
 [![npm](https://img.shields.io/npm/v/udes-cli.svg?style=flat-square)](https://www.npmjs.com/package/udes-cli)
 ![Node](https://img.shields.io/badge/node-6.10.1-brightgreen.svg)
 
 # Introduction
 This package contains Command Line Interface tools for automated certain
-development tasks. Once installed the included scripts can be added to your `package.json`.
+development tasks. Once installed the included scripts can be added to your
+`package.json`.
 
 # Prerequisites
 * [Node](https://nodejs.org) 6.10.1 (it is recommended to install it via
@@ -17,16 +18,28 @@ Since it uses a socket you cannot run it on a local machine.
 
 # Getting started
 ## Installation
+If you want to test or develop on the library simply urn these commands
+```bash
+git clone git@github.com:UdeS-STI/udes-cli.git
+cd udes-cli
+npm install
+# Allows using the CLI directly within the package for testing.
+ln -s `pwd` node_modules/udes-cli
+```
+
+## Add to project
+If you want to add the library to your project simply run
 ```bash
 npm install udes-cli
 ```
 
-## Add to project
-In the `script` section of your `package.json`
+Then, in the `script` section of your `package.json` you can add the commands
+from the library
 ```json
 {
   "scripts": {
-    "polymer-build-dev": "polymer-build --buildName=es5-bundled --rewriteBuildDev"
+    "polymer-build-dev": "polymer-build --buildName=bundled --rewriteBuildDev",
+    "polymer-build": "polymer-build --buildName=es6-bundled"
   }
 }
 ```
