@@ -18,7 +18,6 @@ const argv = require('yargs')
   })
   .array('buildName')
   .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
-  .default('buildName', 'bundled')
   .help('h')
   .alias('h', 'help')
   .argv

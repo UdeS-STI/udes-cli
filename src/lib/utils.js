@@ -31,7 +31,7 @@ export const logger = {
 export const getArguments = () => process.argv.reduce((acc, arg) => {
   if (arg.includes('=') || /^-+\w+/.test(arg)) {
     const { 0: key, 1: value } = arg.split('=')
-    return {
+    return value === 'undefined' ? acc : {
       ...acc,
       [key.replace(/^-+/, '')]: value || true,
     }

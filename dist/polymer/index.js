@@ -43,8 +43,8 @@ var formatArguments = function formatArguments(args) {
     throw new Error('Undefined argument `-rootURI`');
   }
 
-  var dir = formatDir(args.buildFolder || 'build/');
   var defaultBuildNames = void 0;
+  var dir = 'build/';
 
   try {
     var polymerConfig = JSON.parse(_fs2.default.readFileSync(dir + 'polymer.json'));
@@ -184,7 +184,6 @@ var compressInlineIndex = function compressInlineIndex(buildDir) {
 /**
  * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
  * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
- * @param {String} [-buildFolder='build/'] - Build directory
  * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
  * @example
  * node index.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
