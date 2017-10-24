@@ -106,17 +106,16 @@ var copyHtaccess = function copyHtaccess(buildDir) {
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
  * @param {String} devdir -Build directory
- * @param {Boolean} rewriteBuildDev - If true rewrite of htaccess for build directory
  * @throws {Error} If fails to update htaccess file.
  */
-var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev) {
+var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir) {
   var htaccess = buildDir + '/.htaccess';
 
   _utils.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
   var changedFiles = _replaceInFile2.default.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: 'RewriteBase /' + devdir + (rewriteBuildDev ? buildDir : '')
+    to: 'RewriteBase /' + devdir + buildDir
   });
 
   if (!changedFiles.length) {
@@ -200,8 +199,11 @@ try {
     var buildDir = '' + dir + buildName;
     _utils.logger.log('Build directory: ' + buildDir);
 
-    copyHtaccess(buildDir);
-    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev);
+    if (rewriteBuildDev) {
+      copyHtaccess(buildDir);
+      replaceRewriteHtaccess(buildDir, devdir);
+    }
+
     modifyMetaBaseIndex(buildDir);
     modifyInlineIndex(buildDir);
     compressInlineIndex(buildDir);
