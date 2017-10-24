@@ -173,8 +173,10 @@ try {
     const buildDir = `${dir}${buildName}`
     logger.log(`Build directory: ${buildDir}`)
 
-    copyHtaccess(buildDir)
-    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev)
+    if (rewriteBuildDev){
+      copyHtaccess(buildDir)
+      replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev)
+    }
     modifyMetaBaseIndex(buildDir)
     modifyInlineIndex(buildDir)
     compressInlineIndex(buildDir)

@@ -24,7 +24,7 @@ const argv = require('yargs')
   .argv
 
 if (argv.rewriteBuildDev) {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
+  shell.exec(`polymer build && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName} -rewriteBuildDev=true`)
 } else {
-  shell.exec(`polymer build && npm install && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
+  shell.exec(`polymer build && node node_modules/udes-cli/dist/polymer/index.js -- -rootURI=${argv.rootURI} -buildName=${argv.buildName}`)
 }
