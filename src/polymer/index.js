@@ -44,7 +44,7 @@ const formatArguments = (args) => {
   }
 
   return {
-    buildNames: buildName,
+    buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
     devdir: formatDir(rootURI),
     dir,
     rewriteBuildDev,

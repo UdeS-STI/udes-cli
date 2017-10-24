@@ -68,7 +68,7 @@ var formatArguments = function formatArguments(args) {
   }
 
   return {
-    buildNames: buildName,
+    buildNames: Array.isArray(buildName) ? buildName : [buildName],
     devdir: formatDir(rootURI),
     dir: dir,
     rewriteBuildDev: rewriteBuildDev
@@ -129,14 +129,14 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir) {
  * update meta tags in index files.
  * @param {String} buildDir - Location of build directory.
  */
-var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir) {
+var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir, devdir) {
   var index = buildDir + '/_index.html';
 
   _utils.logger.log('Replace <meta base> of ' + index + '...');
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
-    from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#/]*/,
-    to: 'base href="/' // For local execution only.
+    from: /base\shref="\/"/, // For local execution only.
+    to: 'https://www.usherbrooke.ca/' + devdir
   });
 
   _utils.logger.log('_index.html modified: ' + !!changedFiles.length);
@@ -204,7 +204,7 @@ try {
       replaceRewriteHtaccess(buildDir, devdir);
     }
 
-    modifyMetaBaseIndex(buildDir);
+    modifyMetaBaseIndex(buildDir, devdir);
     modifyInlineIndex(buildDir);
     compressInlineIndex(buildDir);
   });
