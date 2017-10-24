@@ -261,8 +261,11 @@ try {
     var buildDir = '' + args.dir + buildName;
     logger.log('Build directory: ' + buildDir);
 
-    copyHtaccess(buildDir);
-    replaceRewriteHtaccess(buildDir, args);
+    if (args.rewriteBuildDev) {
+      copyHtaccess(buildDir);
+      replaceRewriteHtaccess(buildDir, args.devdir, args.rewriteBuildDev);
+    }
+
     modifyMetaBaseIndex(buildDir);
     modifyInlineIndex(buildDir);
     compressInlineIndex(buildDir);
