@@ -106,6 +106,7 @@ var copyHtaccess = function copyHtaccess(buildDir) {
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
  * @param {String} devdir -Build directory
+ * @param {String} rewriteBuildDev -Is dev env.
  * @throws {Error} If fails to update htaccess file.
  */
 var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev) {
@@ -129,6 +130,7 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir, r
 /**
  * update meta tags in index files.
  * @param {String} buildDir - Location of build directory.
+ * @param {String} devdir -Build directory
  */
 var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir, devdir) {
   var index = buildDir + '/_index.html';
@@ -136,7 +138,7 @@ var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir, devdir) {
   _utils.logger.log('Replace <meta base> of ' + index + '...');
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
-    from: /base\shref="\/"/, // For local execution only.
+    from: /base\shref="(.*)"/, // For local execution only.
     to: 'base href="https://www.usherbrooke.ca/' + devdir + '"'
   });
 

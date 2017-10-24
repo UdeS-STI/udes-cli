@@ -82,6 +82,7 @@ const copyHtaccess = (buildDir) => {
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
  * @param {String} devdir -Build directory
+ * @param {String} rewriteBuildDev -Is dev env.
  * @throws {Error} If fails to update htaccess file.
  */
 const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
@@ -92,7 +93,7 @@ const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
   const changedFiles = replace.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: to
+    to: to,
   })
 
   if (!changedFiles.length) {
@@ -105,6 +106,7 @@ const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
 /**
  * update meta tags in index files.
  * @param {String} buildDir - Location of build directory.
+ * @param {String} devdir -Build directory
  */
 const modifyMetaBaseIndex = (buildDir, devdir) => {
   const index = `${buildDir}/_index.html`
@@ -112,7 +114,7 @@ const modifyMetaBaseIndex = (buildDir, devdir) => {
   logger.log(`Replace <meta base> of ${index}...`)
   const changedFiles = replace.sync({
     files: index,
-    from: /base\shref="\/"/, // For local execution only.
+    from: /base\shref="(.*)"/, // For local execution only.
     to: `base href="https://www.usherbrooke.ca/${devdir}"`,
   })
 
