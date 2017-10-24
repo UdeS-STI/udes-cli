@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/udes-cli
+    docker:
+      - image: circleci/node:6.10
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: install-dependencies
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+            - ~/.cache/npm
+      - run:
+          name: linter
+          command: npm run lint
