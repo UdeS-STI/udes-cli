@@ -44,7 +44,7 @@ const formatArguments = (args) => {
   }
 
   return {
-    buildNames: buildName,
+    buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
     devdir: formatDir(rootURI),
     dir,
     rewriteBuildDev,
@@ -82,16 +82,18 @@ const copyHtaccess = (buildDir) => {
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
  * @param {String} devdir -Build directory
+ * @param {String} rewriteBuildDev -Is dev env.
  * @throws {Error} If fails to update htaccess file.
  */
-const replaceRewriteHtaccess = (buildDir, devdir) => {
+const replaceRewriteHtaccess = (buildDir, devdir, rewriteBuildDev) => {
   const htaccess = `${buildDir}/.htaccess`
+  const to = (rewriteBuildDev) ? `RewriteBase /${devdir}${buildDir}` : `RewriteBase /${devdir}`
 
   logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
   const changedFiles = replace.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: `RewriteBase /${devdir}${buildDir}`,
+    to: to,
   })
 
   if (!changedFiles.length) {
@@ -104,15 +106,16 @@ const replaceRewriteHtaccess = (buildDir, devdir) => {
 /**
  * update meta tags in index files.
  * @param {String} buildDir - Location of build directory.
+ * @param {String} devdir -Build directory
  */
-const modifyMetaBaseIndex = (buildDir) => {
+const modifyMetaBaseIndex = (buildDir, devdir) => {
   const index = `${buildDir}/_index.html`
 
   logger.log(`Replace <meta base> of ${index}...`)
   const changedFiles = replace.sync({
     files: index,
-    from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#/]*/,
-    to: 'base href="/', // For local execution only.
+    from: /base\shref="(.*)"/, // For local execution only.
+    to: `base href="https://www.usherbrooke.ca/${devdir}"`,
   })
 
   logger.log(`_index.html modified: ${!!changedFiles.length}`)
@@ -171,12 +174,9 @@ try {
     const buildDir = `${dir}${buildName}`
     logger.log(`Build directory: ${buildDir}`)
 
-    if (rewriteBuildDev) {
-      copyHtaccess(buildDir)
-      replaceRewriteHtaccess(buildDir, devdir)
-    }
-
-    modifyMetaBaseIndex(buildDir)
+    copyHtaccess(buildDir)
+    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev)
+    modifyMetaBaseIndex(buildDir, devdir)
     modifyInlineIndex(buildDir)
     compressInlineIndex(buildDir)
   })
