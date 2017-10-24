@@ -19,10 +19,12 @@
   "scripts": {
     "build": "babel ./src --out-dir dist",
     "lint": "eslint ./src; eslint ./bin",
-    "udes-polymer-build": "polymer-build"
+    "udes-polymer-build": "polymer-build",
+    "udes": "udes"
   },
   "bin": {
-    "polymer-build": "bin/polymer/polymer-build.js"
+    "polymer-build": "bin/polymer/polymer-build.js",
+    "udes": "bin/udes.js"
   },
   "repository": {
     "type": "git",

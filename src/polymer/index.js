@@ -81,7 +81,7 @@ const copyHtaccess = (buildDir) => {
 /**
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
- * @param {String} devdir -Build directory
+ * @param {String} devdir - Build directory
  * @throws {Error} If fails to update htaccess file.
  */
 const replaceRewriteHtaccess = (buildDir, devdir) => {
