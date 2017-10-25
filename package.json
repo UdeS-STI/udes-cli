@@ -18,12 +18,9 @@
   },
   "scripts": {
     "build": "babel ./src --out-dir dist",
-    "lint": "eslint ./src; eslint ./bin",
-    "udes-polymer-build": "polymer-build",
-    "udes": "udes"
+    "lint": "eslint ./src; eslint ./bin"
   },
   "bin": {
-    "polymer-build": "bin/polymer/polymer-build.js",
     "udes": "bin/udes.js"
   },
   "repository": {

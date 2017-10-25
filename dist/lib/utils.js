@@ -63,7 +63,7 @@ var logger = exports.logger = _extends({}, console, {
    * @returns {Object} An object containing the command line arguments.
    */
 });var getArguments = exports.getArguments = function getArguments() {
-  return process.argv.reduce(function (acc, arg) {
+  return process.argv.slice(3).reduce(function (acc, arg) {
     if (arg.includes('=') || /^-+\w+/.test(arg)) {
       var _arg$split = arg.split('='),
           key = _arg$split[0],
