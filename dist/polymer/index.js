@@ -68,7 +68,7 @@ var formatArguments = function formatArguments(args) {
   }
 
   return {
-    buildNames: buildName,
+    buildNames: Array.isArray(buildName) ? buildName : [buildName],
     devdir: formatDir(rootURI),
     dir: dir,
     rewriteBuildDev: rewriteBuildDev
@@ -106,16 +106,18 @@ var copyHtaccess = function copyHtaccess(buildDir) {
  * Update RewriteBase info in htaccess file.
  * @param {String} buildDir - Location of build directory.
  * @param {String} devdir -Build directory
+ * @param {String} rewriteBuildDev -Is dev env.
  * @throws {Error} If fails to update htaccess file.
  */
-var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir) {
+var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev) {
   var htaccess = buildDir + '/.htaccess';
+  var to = rewriteBuildDev ? 'RewriteBase /' + devdir + buildDir : 'RewriteBase /' + devdir;
 
   _utils.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
   var changedFiles = _replaceInFile2.default.sync({
     files: htaccess,
     from: /RewriteBase[\s]+.*/,
-    to: 'RewriteBase /' + devdir + buildDir
+    to: to
   });
 
   if (!changedFiles.length) {
@@ -128,15 +130,16 @@ var replaceRewriteHtaccess = function replaceRewriteHtaccess(buildDir, devdir) {
 /**
  * update meta tags in index files.
  * @param {String} buildDir - Location of build directory.
+ * @param {String} devdir -Build directory
  */
-var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir) {
+var modifyMetaBaseIndex = function modifyMetaBaseIndex(buildDir, devdir) {
   var index = buildDir + '/_index.html';
 
   _utils.logger.log('Replace <meta base> of ' + index + '...');
   var changedFiles = _replaceInFile2.default.sync({
     files: index,
-    from: /base\shref="https:\/\/www.usherbrooke.ca[\w\d\-~=+#/]*/,
-    to: 'base href="/' // For local execution only.
+    from: /base\shref="(.*)"/, // For local execution only.
+    to: 'base href="https://www.usherbrooke.ca/' + devdir + '"'
   });
 
   _utils.logger.log('_index.html modified: ' + !!changedFiles.length);
@@ -199,12 +202,9 @@ try {
     var buildDir = '' + dir + buildName;
     _utils.logger.log('Build directory: ' + buildDir);
 
-    if (rewriteBuildDev) {
-      copyHtaccess(buildDir);
-      replaceRewriteHtaccess(buildDir, devdir);
-    }
-
-    modifyMetaBaseIndex(buildDir);
+    copyHtaccess(buildDir);
+    replaceRewriteHtaccess(buildDir, devdir, rewriteBuildDev);
+    modifyMetaBaseIndex(buildDir, devdir);
     modifyInlineIndex(buildDir);
     compressInlineIndex(buildDir);
   });
