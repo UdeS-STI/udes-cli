@@ -12,13 +12,9 @@ var _replaceInFile = require('replace-in-file');
 
 var _replaceInFile2 = _interopRequireDefault(_replaceInFile);
 
-var _inlineSource = require('inline-source');
+var _uglifyEs = require('uglify-es');
 
-var _inlineSource2 = _interopRequireDefault(_inlineSource);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
+var _uglifyEs2 = _interopRequireDefault(_uglifyEs);
 
 var _utils = require('../lib/utils');
 
@@ -165,19 +161,32 @@ var modifyInlineIndex = function modifyInlineIndex(buildDir) {
  * @throws {Error} If no file is compressed.
  */
 var compressInlineIndex = function compressInlineIndex(buildDir) {
+  var getInlineTag = function getInlineTag(html) {
+    return (/<script inline src="([\w/]+.js)"><\/script>/g.exec(html)
+    );
+  };
   var index = buildDir + '/_index.html';
 
   _utils.logger.log('Minify and compress <src inline> in ' + index + '...');
-  var html = _inlineSource2.default.sync(_path2.default.resolve(index), {
-    compress: true,
-    rootpath: _path2.default.resolve('./')
-  });
 
-  if (!html) {
-    throw new Error(index + ' not compressed');
+  try {
+    var html = _fs2.default.readFileSync(index).toString();
+    var match = getInlineTag(html);
+
+    while (match) {
+      var source = match[1];
+      var code = _fs2.default.readFileSync(buildDir + '/' + source).toString();
+      var minifiedCode = _uglifyEs2.default.minify(code).code;
+
+      html = html.replace('<script inline src="' + source + '"></script>', '<script>' + minifiedCode + '</script>');
+      match = getInlineTag(html);
+    }
+
+    _fs2.default.writeFileSync(index, html);
+    _utils.logger.log('Minify and compress <src inline> Ok!');
+  } catch (err) {
+    _utils.logger.error(err);
   }
-
-  _utils.logger.log('Minify and compress <src inline> Ok!');
 };
 
 /**
