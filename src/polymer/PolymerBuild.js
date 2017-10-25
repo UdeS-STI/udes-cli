@@ -53,12 +53,8 @@ const formatArguments = (args) => {
 }
 
 /**
- * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
- * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
- * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
- * @example
- * node PolymerBuild.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
- * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
+ * @class
+ * @param {Object} args - Received arguments.
  */
 export default class PolymerBuild {
   constructor (args) {
