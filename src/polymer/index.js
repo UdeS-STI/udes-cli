@@ -140,7 +140,7 @@ const modifyInlineIndex = (buildDir) => {
  * @throws {Error} If no file is compressed.
  */
 const compressInlineIndex = (buildDir) => {
-  const getInlineTag = html => /<script inline src="(.+)">/g.exec(html)
+  const getInlineTag = html => /<script inline src="([\w/]+.js)"><\/script>/g.exec(html)
   const index = `${buildDir}/_index.html`
 
   logger.log(`Minify and compress <src inline> in ${index}...`)
@@ -151,7 +151,7 @@ const compressInlineIndex = (buildDir) => {
 
     while (match) {
       const source = match[1]
-      const code = fs.readFileSync(`${buildDir}${source}`).toString()
+      const code = fs.readFileSync(`${buildDir}/${source}`).toString()
       const minifiedCode = UglifyJS.minify(code).code
 
       html = html.replace(
