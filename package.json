@@ -1,7 +1,7 @@
 {
   "name": "udes-cli",
   "version": "0.1.8",
-  "description": "Utility fonctions to use in npm script",
+  "description": "CLI tools used at UdeS",
   "dependencies": {
     "cpx": "^1.5.0",
     "inline-source-cli": "^1.2.0",
