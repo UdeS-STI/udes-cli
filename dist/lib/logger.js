@@ -8,8 +8,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var _debug = true;
@@ -57,21 +55,4 @@ var logger = exports.logger = _extends({}, console, {
 
     return (_console2 = console).log.apply(_console2, _toConsumableArray(getLogArguments.apply(undefined, ['ERROR'].concat(args))));
   }
-
-  /**
-   * Converts the arguments array into a readable object.
-   * @returns {Object} An object containing the command line arguments.
-   */
-});var getArguments = exports.getArguments = function getArguments() {
-  return process.argv.slice(3).reduce(function (acc, arg) {
-    if (arg.includes('=') || /^-+\w+/.test(arg)) {
-      var _arg$split = arg.split('='),
-          key = _arg$split[0],
-          value = _arg$split[1];
-
-      return value === 'undefined' ? acc : _extends({}, acc, _defineProperty({}, key.replace(/^-+/, ''), value || true));
-    }
-
-    return acc;
-  }, {});
-};
+});

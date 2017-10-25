@@ -4,10 +4,14 @@ import PolymerBuild from './polymer/PolymerBuild'
 
 /**
  * @class
- * @param {null}
  * Dispatch commands to proper class.
+ * @param {String} command - The received command.
  */
 export default class UdeSCLI {
+  constructor (command) {
+    this.command = command
+  }
+
   /**
    * Display help information.
    */
@@ -22,15 +26,14 @@ export default class UdeSCLI {
 
   /**
    * Dispatch command to proper class.
-   * @param {String} command - The received command.
-   * @param {Object} args - Received arguments.
    */
-  run = (command, args) => {
+  run = () => {
     let commandInstance
 
-    switch (command) {
+    switch (this.command) {
       case 'polymer-build':
-        commandInstance = new PolymerBuild(args)
+        console.log('polymer-build')
+        commandInstance = new PolymerBuild()
         commandInstance.run()
         break
       default:

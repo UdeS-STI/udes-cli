@@ -3,27 +3,18 @@ import fs from 'fs'
 import inline from 'inline-source'
 import path from 'path'
 import replace from 'replace-in-file'
+import shell from 'shelljs'
 import yargs from 'yargs'
 
-import { logger } from '../lib/utils'
-
-/**
- * Ensures that the directory is in a standard format.
- * @param {String} dir - A directory path.
- * @returns {String} Properly formatted directory (dir/example/).
- */
-const formatDir = dir => dir.replace(/^\//, '').replace(/([^/])$/, '$&/')
+import { logger } from '../lib/logger'
 
 /**
  * Converts command line arguments into a usable object.
+ * @private
  * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
 const formatArguments = (args) => {
-  if (!args.rootURI) {
-    throw new Error('Undefined argument `-rootURI`')
-  }
-
   let defaultBuildNames
   const dir = 'build/'
 
@@ -36,7 +27,7 @@ const formatArguments = (args) => {
 
   const {
     buildName = defaultBuildNames,
-    rewriteBuildDev,
+    rewriteBuildDev = false,
     rootURI,
   } = args
 
@@ -46,7 +37,7 @@ const formatArguments = (args) => {
 
   return {
     buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
-    devdir: formatDir(rootURI),
+    devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir,
     rewriteBuildDev,
   }
@@ -54,12 +45,11 @@ const formatArguments = (args) => {
 
 /**
  * @class
- * @param {Object} args - Received arguments.
  */
 export default class PolymerBuild {
-  constructor (args) {
+  constructor () {
     this.validateArgv()
-    this.args = formatArguments(args)
+    this.args = formatArguments(this.argv)
   }
 
   validateArgv = () => {
@@ -187,6 +177,8 @@ export default class PolymerBuild {
   }
 
   run = () => {
+    shell.exec('polymer build')
+
     try {
       this.args.buildNames.forEach((buildName) => {
         this.buildDir = `${this.args.dir}${buildName}`

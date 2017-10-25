@@ -24,35 +24,27 @@ var _replaceInFile = require('replace-in-file');
 
 var _replaceInFile2 = _interopRequireDefault(_replaceInFile);
 
+var _shelljs = require('shelljs');
+
+var _shelljs2 = _interopRequireDefault(_shelljs);
+
 var _yargs = require('yargs');
 
 var _yargs2 = _interopRequireDefault(_yargs);
 
-var _utils = require('../lib/utils');
+var _logger = require('../lib/logger');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
- * Ensures that the directory is in a standard format.
- * @param {String} dir - A directory path.
- * @returns {String} Properly formatted directory (dir/example/).
- */
-var formatDir = function formatDir(dir) {
-  return dir.replace(/^\//, '').replace(/([^/])$/, '$&/');
-};
-
-/**
  * Converts command line arguments into a usable object.
+ * @private
  * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
 var formatArguments = function formatArguments(args) {
-  if (!args.rootURI) {
-    throw new Error('Undefined argument `-rootURI`');
-  }
-
   var defaultBuildNames = void 0;
   var dir = 'build/';
 
@@ -69,32 +61,28 @@ var formatArguments = function formatArguments(args) {
 
   var _args$buildName = args.buildName,
       buildName = _args$buildName === undefined ? defaultBuildNames : _args$buildName,
-      rewriteBuildDev = args.rewriteBuildDev,
+      _args$rewriteBuildDev = args.rewriteBuildDev,
+      rewriteBuildDev = _args$rewriteBuildDev === undefined ? false : _args$rewriteBuildDev,
       rootURI = args.rootURI;
 
 
   if (rewriteBuildDev) {
-    _utils.logger.debug('.htaccess Rewrite without build directory: true');
+    _logger.logger.debug('.htaccess Rewrite without build directory: true');
   }
 
   return {
     buildNames: Array.isArray(buildName) ? buildName : [buildName],
-    devdir: formatDir(rootURI),
+    devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir: dir,
     rewriteBuildDev: rewriteBuildDev
   };
 };
 
 /**
- * @param {String} -rootURI - Choose a build (eg.: -rootURI='~webv9201/nsquart2/inscription-fcnc/')
- * @param {Boolean} [-rewriteBuildDev] - If true rewrite of htaccess for build directory (eg: -rewriteBuildDev=true)
- * @param {[String]} [-buildName=['bundled', 'unbundled']] (optional)
- * @example
- * node PolymerBuild.js -- -addBuildDir=true -rootURI='~webv9201/nsquart2/inscription-fcnc/'
- * npm run build -- -rootURI='~webv9201/nsquart2/inscription-fcnc/'
+ * @class
  */
 
-var PolymerBuild = function PolymerBuild(args) {
+var PolymerBuild = function PolymerBuild() {
   var _this = this;
 
   _classCallCheck(this, PolymerBuild);
@@ -123,17 +111,17 @@ var PolymerBuild = function PolymerBuild(args) {
       throw new Error('Error, file ' + sourceHtaccess + ' not found.');
     }
 
-    _utils.logger.log('Copy of .htaccess.sample to ' + _this.args.buildDir + '...');
+    _logger.logger.log('Copy of .htaccess.sample to ' + _this.args.buildDir + '...');
     _cpx2.default.copySync(sourceHtaccess, _this.args.buildDir);
 
-    _utils.logger.log('Rename ' + htaccessSample + ' to ' + htaccess + '...');
+    _logger.logger.log('Rename ' + htaccessSample + ' to ' + htaccess + '...');
     _fs2.default.renameSync(htaccessSample, htaccess);
 
     if (!_fs2.default.existsSync(htaccess)) {
       throw new Error('Error, file ' + htaccess + ' not found');
     }
 
-    _utils.logger.log('Rename completed!');
+    _logger.logger.log('Rename completed!');
   };
 
   this.replaceRewriteHtaccess = function () {
@@ -145,7 +133,7 @@ var PolymerBuild = function PolymerBuild(args) {
     var htaccess = buildDir + '/.htaccess';
     var to = rewriteBuildDev ? 'RewriteBase /' + devdir + buildDir : 'RewriteBase /' + devdir;
 
-    _utils.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
+    _logger.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
     var changedFiles = _replaceInFile2.default.sync({
       files: htaccess,
       from: /RewriteBase[\s]+.*/,
@@ -156,39 +144,39 @@ var PolymerBuild = function PolymerBuild(args) {
       throw new Error('.htaccess not modified');
     }
 
-    _utils.logger.log('.htaccess modified!');
+    _logger.logger.log('.htaccess modified!');
   };
 
   this.modifyMetaBaseIndex = function () {
     var index = _this.args.buildDir + '/_index.html';
 
-    _utils.logger.log('Replace <meta base> of ' + index + '...');
+    _logger.logger.log('Replace <meta base> of ' + index + '...');
     var changedFiles = _replaceInFile2.default.sync({
       files: index,
       from: /base\shref="(.*)"/, // For local execution only.
       to: 'base href="https://www.usherbrooke.ca/' + _this.args.devdir + '"'
     });
 
-    _utils.logger.log('_index.html modified: ' + !!changedFiles.length);
+    _logger.logger.log('_index.html modified: ' + !!changedFiles.length);
   };
 
   this.modifyInlineIndex = function () {
     var index = _this.args.buildDir + '/_index.html';
 
-    _utils.logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
+    _logger.logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
     _replaceInFile2.default.sync({
       files: index,
       from: /inline=""/g,
       to: 'inline'
     });
 
-    _utils.logger.log('Replace <src inline> Ok!');
+    _logger.logger.log('Replace <src inline> Ok!');
   };
 
   this.compressInlineIndex = function () {
     var index = _this.args.buildDir + '/_index.html';
 
-    _utils.logger.log('Minify and compress <src inline> in ' + index + '...');
+    _logger.logger.log('Minify and compress <src inline> in ' + index + '...');
     var html = _inlineSource2.default.sync(_path2.default.resolve(index), {
       compress: true,
       rootpath: _path2.default.resolve('./')
@@ -198,14 +186,16 @@ var PolymerBuild = function PolymerBuild(args) {
       throw new Error(index + ' not compressed');
     }
 
-    _utils.logger.log('Minify and compress <src inline> Ok!');
+    _logger.logger.log('Minify and compress <src inline> Ok!');
   };
 
   this.run = function () {
+    _shelljs2.default.exec('polymer build');
+
     try {
       _this.args.buildNames.forEach(function (buildName) {
         _this.buildDir = '' + _this.args.dir + buildName;
-        _utils.logger.log('Build directory: ' + _this.buildDir);
+        _logger.logger.log('Build directory: ' + _this.buildDir);
 
         _this.copyHtaccess();
         _this.replaceRewriteHtaccess();
@@ -216,13 +206,13 @@ var PolymerBuild = function PolymerBuild(args) {
 
       process.exit(0);
     } catch (error) {
-      _utils.logger.error(error);
+      _logger.logger.error(error);
       process.exit(1);
     }
   };
 
   this.validateArgv();
-  this.args = formatArguments(args);
+  this.args = formatArguments(this.argv);
 }
 
 /**
