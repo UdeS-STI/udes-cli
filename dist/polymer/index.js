@@ -161,11 +161,10 @@ var modifyInlineIndex = function modifyInlineIndex(buildDir) {
 /**
  * Minify and compress src tags in index files.
  * @param {String} buildDir - Location of build directory.
- * @throws {Error} If no file is compressed.
  */
 var compressInlineIndex = function compressInlineIndex(buildDir) {
   var getInlineTag = function getInlineTag(html) {
-    return (/<script inline src="([\w/]+.js)"><\/script>/g.exec(html)
+    return (/<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
     );
   };
   var index = buildDir + '/_index.html';

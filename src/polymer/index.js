@@ -140,7 +140,6 @@ const modifyInlineIndex = (buildDir) => {
 /**
  * Minify and compress src tags in index files.
  * @param {String} buildDir - Location of build directory.
- * @throws {Error} If no file is compressed.
  */
 const compressInlineIndex = (buildDir) => {
   const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
