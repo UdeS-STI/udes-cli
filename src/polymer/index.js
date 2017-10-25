@@ -143,7 +143,7 @@ const modifyInlineIndex = (buildDir) => {
  * @throws {Error} If no file is compressed.
  */
 const compressInlineIndex = (buildDir) => {
-  const getInlineTag = html => /<script inline src="([\w/]+.js)"><\/script>/g.exec(html)
+  const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
   const index = `${buildDir}/_index.html`
 
   logger.log(`Minify and compress <src inline> in ${index}...`)
