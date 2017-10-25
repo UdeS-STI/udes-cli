@@ -17,23 +17,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
- * @class
  * Dispatch commands to proper class.
- * @param {String} command - The received command.
+ * @class
  */
-var UdeSCLI = function UdeSCLI(command) {
+var UdeSCLI = function UdeSCLI() {
   var _this = this;
 
   _classCallCheck(this, UdeSCLI);
 
   this.help = function () {
-    _this.argv = _yargs2.default.usage('Usage: udes <command> [options]').command('polymer-build', 'Build a repo for release').help('h').alias('h', 'help').argv;
+    _this.argv = _yargs2.default.usage('Usage: udes <command> [options]').command('polymer-build', 'Build a polymer repo for release').help('h').alias('h', 'help').argv;
   };
 
-  this.run = function () {
+  this.run = function (command) {
     var commandInstance = void 0;
 
-    switch (_this.command) {
+    switch (command) {
       case 'polymer-build':
         console.log('polymer-build');
         commandInstance = new _PolymerBuild2.default();
@@ -43,10 +42,7 @@ var UdeSCLI = function UdeSCLI(command) {
         _this.help();
     }
   };
-
-  this.command = command;
 }
-
 /**
  * Display help information.
  */
@@ -54,6 +50,7 @@ var UdeSCLI = function UdeSCLI(command) {
 
 /**
  * Dispatch command to proper class.
+ * @param {String} command - The received command.
  */
 ;
 

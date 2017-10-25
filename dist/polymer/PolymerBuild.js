@@ -79,6 +79,7 @@ var formatArguments = function formatArguments(args) {
 };
 
 /**
+ * Class to handle actions related to building a polymer project.
  * @class
  */
 
@@ -216,6 +217,11 @@ var PolymerBuild = function PolymerBuild() {
 }
 
 /**
+ * Validate CLI arguments.
+ */
+
+
+/**
  * Copy sample htaccess file to the build directory.
  * @throws {Error} If copy fails.
  */
@@ -240,6 +246,11 @@ var PolymerBuild = function PolymerBuild() {
 /**
  * Minify and compress src tags in index files.
  * @throws {Error} If no file is compressed.
+ */
+
+
+/**
+ * Execute code for building polymer project.
  */
 ;
 

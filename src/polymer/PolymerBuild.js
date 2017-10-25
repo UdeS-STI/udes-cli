@@ -44,6 +44,7 @@ const formatArguments = (args) => {
 }
 
 /**
+ * Class to handle actions related to building a polymer project.
  * @class
  */
 export default class PolymerBuild {
@@ -52,6 +53,9 @@ export default class PolymerBuild {
     this.args = formatArguments(this.argv)
   }
 
+  /**
+   * Validate CLI arguments.
+   */
   validateArgv = () => {
     this.argv = yargs.usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
       .option('rewriteBuildDev', {
@@ -176,6 +180,9 @@ export default class PolymerBuild {
     logger.log('Minify and compress <src inline> Ok!')
   }
 
+  /**
+   * Execute code for building polymer project.
+   */
   run = () => {
     shell.exec('polymer build')
 

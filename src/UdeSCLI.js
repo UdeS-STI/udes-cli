@@ -3,22 +3,17 @@ import yargs from 'yargs'
 import PolymerBuild from './polymer/PolymerBuild'
 
 /**
- * @class
  * Dispatch commands to proper class.
- * @param {String} command - The received command.
+ * @class
  */
 export default class UdeSCLI {
-  constructor (command) {
-    this.command = command
-  }
-
   /**
    * Display help information.
    */
   help = () => {
     this.argv = yargs
       .usage('Usage: udes <command> [options]')
-      .command('polymer-build', 'Build a repo for release')
+      .command('polymer-build', 'Build a polymer repo for release')
       .help('h')
       .alias('h', 'help')
       .argv
@@ -26,11 +21,12 @@ export default class UdeSCLI {
 
   /**
    * Dispatch command to proper class.
+   * @param {String} command - The received command.
    */
-  run = () => {
+  run = (command) => {
     let commandInstance
 
-    switch (this.command) {
+    switch (command) {
       case 'polymer-build':
         console.log('polymer-build')
         commandInstance = new PolymerBuild()
