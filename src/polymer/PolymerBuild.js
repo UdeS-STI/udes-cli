@@ -205,9 +205,9 @@ export default class PolymerBuild {
 
         if (this.args.rewriteBuildDev) {
           this.copyHtaccess()
+          this.replaceRewriteHtaccess()
         }
 
-        this.replaceRewriteHtaccess()
         this.modifyMetaBaseIndex()
         this.modifyInlineIndex()
         this.compressInlineIndex()

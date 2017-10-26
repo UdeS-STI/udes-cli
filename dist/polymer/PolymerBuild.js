@@ -215,9 +215,9 @@ var PolymerBuild = function PolymerBuild() {
 
         if (_this.args.rewriteBuildDev) {
           _this.copyHtaccess();
+          _this.replaceRewriteHtaccess();
         }
 
-        _this.replaceRewriteHtaccess();
         _this.modifyMetaBaseIndex();
         _this.modifyInlineIndex();
         _this.compressInlineIndex();
