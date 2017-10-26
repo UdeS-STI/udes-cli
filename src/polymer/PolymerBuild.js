@@ -203,7 +203,10 @@ export default class PolymerBuild {
         this.buildDir = `${this.args.dir}${buildName}`
         logger.log(`Build directory: ${this.buildDir}`)
 
-        this.copyHtaccess()
+        if (this.args.rewriteBuildDev) {
+          this.copyHtaccess()
+        }
+
         this.replaceRewriteHtaccess()
         this.modifyMetaBaseIndex()
         this.modifyInlineIndex()

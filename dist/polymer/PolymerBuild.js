@@ -144,13 +144,18 @@ var PolymerBuild = function PolymerBuild() {
   };
 
   this.modifyMetaBaseIndex = function () {
-    var index = _this.args.buildDir + '/_index.html';
+    var _args2 = _this.args,
+        devdir = _args2.devdir,
+        buildDir = _args2.buildDir,
+        rewriteBuildDev = _args2.rewriteBuildDev;
+
+    var index = buildDir + '/_index.html';
 
     _logger.logger.log('Replace <meta base> of ' + index + '...');
     var changedFiles = _replaceInFile2.default.sync({
       files: index,
       from: /base\shref="(.*)"/, // For local execution only.
-      to: 'base href="https://www.usherbrooke.ca/' + _this.args.devdir + '"'
+      to: 'base href="/' + devdir + (rewriteBuildDev ? buildDir : '') + '"'
     });
 
     _logger.logger.log('_index.html modified: ' + !!changedFiles.length);
@@ -208,7 +213,10 @@ var PolymerBuild = function PolymerBuild() {
         _this.buildDir = '' + _this.args.dir + buildName;
         _logger.logger.log('Build directory: ' + _this.buildDir);
 
-        _this.copyHtaccess();
+        if (_this.args.rewriteBuildDev) {
+          _this.copyHtaccess();
+        }
+
         _this.replaceRewriteHtaccess();
         _this.modifyMetaBaseIndex();
         _this.modifyInlineIndex();
