@@ -1,8 +1,7 @@
 import cpx from 'cpx'
 import fs from 'fs'
 import replace from 'replace-in-file'
-import inline from 'inline-source'
-import path from 'path'
+import UglifyJS from 'uglify-es'
 
 import { getArguments, logger } from '../lib/utils'
 
@@ -141,22 +140,34 @@ const modifyInlineIndex = (buildDir) => {
 /**
  * Minify and compress src tags in index files.
  * @param {String} buildDir - Location of build directory.
- * @throws {Error} If no file is compressed.
  */
 const compressInlineIndex = (buildDir) => {
+  const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
   const index = `${buildDir}/_index.html`
 
   logger.log(`Minify and compress <src inline> in ${index}...`)
-  const html = inline.sync(path.resolve(index), {
-    compress: true,
-    rootpath: path.resolve('./'),
-  })
 
-  if (!html) {
-    throw new Error(`${index} not compressed`)
+  try {
+    let html = fs.readFileSync(index).toString()
+    let match = getInlineTag(html)
+
+    while (match) {
+      const source = match[1]
+      const code = fs.readFileSync(`${buildDir}/${source}`).toString()
+      const minifiedCode = UglifyJS.minify(code).code
+
+      html = html.replace(
+        `<script inline src="${source}"></script>`,
+        `<script>${minifiedCode}</script>`
+      )
+      match = getInlineTag(html)
+    }
+
+    fs.writeFileSync(index, html)
+    logger.log('Minify and compress <src inline> Ok!')
+  } catch (err) {
+    logger.error(err)
   }
-
-  logger.log('Minify and compress <src inline> Ok!')
 }
 
 /**
