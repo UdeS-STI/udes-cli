@@ -1,9 +1,8 @@
 import cpx from 'cpx'
 import fs from 'fs'
-import inline from 'inline-source'
-import path from 'path'
 import replace from 'replace-in-file'
 import shell from 'shelljs'
+import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
 
 import { logger } from '../lib/logger'
@@ -112,13 +111,12 @@ export default class PolymerBuild {
   replaceRewriteHtaccess = () => {
     const { buildDir, devdir, rewriteBuildDev } = this.args
     const htaccess = `${buildDir}/.htaccess`
-    const to = (rewriteBuildDev) ? `RewriteBase /${devdir}${buildDir}` : `RewriteBase /${devdir}`
 
     logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
     const changedFiles = replace.sync({
       files: htaccess,
       from: /RewriteBase[\s]+.*/,
-      to: to,
+      to: `RewriteBase /${devdir}${rewriteBuildDev ? buildDir : ''}`,
     })
 
     if (!changedFiles.length) {
@@ -162,22 +160,35 @@ export default class PolymerBuild {
 
   /**
    * Minify and compress src tags in index files.
-   * @throws {Error} If no file is compressed.
    */
   compressInlineIndex = () => {
-    const index = `${this.args.buildDir}/_index.html`
+    const { buildDir } = this.args
+    const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
+    const index = `${buildDir}/_index.html`
 
     logger.log(`Minify and compress <src inline> in ${index}...`)
-    const html = inline.sync(path.resolve(index), {
-      compress: true,
-      rootpath: path.resolve('./'),
-    })
 
-    if (!html) {
-      throw new Error(`${index} not compressed`)
+    try {
+      let html = fs.readFileSync(index).toString()
+      let match = getInlineTag(html)
+
+      while (match) {
+        const source = match[1]
+        const code = fs.readFileSync(`${buildDir}/${source}`).toString()
+        const minifiedCode = UglifyJS.minify(code).code
+
+        html = html.replace(
+          `<script inline src="${source}"></script>`,
+          `<script>${minifiedCode}</script>`
+        )
+        match = getInlineTag(html)
+      }
+
+      fs.writeFileSync(index, html)
+      logger.log('Minify and compress <src inline> Ok!')
+    } catch (err) {
+      logger.error(err)
     }
-
-    logger.log('Minify and compress <src inline> Ok!')
   }
 
   /**

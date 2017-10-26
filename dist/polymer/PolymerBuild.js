@@ -12,14 +12,6 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _inlineSource = require('inline-source');
-
-var _inlineSource2 = _interopRequireDefault(_inlineSource);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
 var _replaceInFile = require('replace-in-file');
 
 var _replaceInFile2 = _interopRequireDefault(_replaceInFile);
@@ -27,6 +19,10 @@ var _replaceInFile2 = _interopRequireDefault(_replaceInFile);
 var _shelljs = require('shelljs');
 
 var _shelljs2 = _interopRequireDefault(_shelljs);
+
+var _uglifyEs = require('uglify-es');
+
+var _uglifyEs2 = _interopRequireDefault(_uglifyEs);
 
 var _yargs = require('yargs');
 
@@ -132,13 +128,12 @@ var PolymerBuild = function PolymerBuild() {
         rewriteBuildDev = _args.rewriteBuildDev;
 
     var htaccess = buildDir + '/.htaccess';
-    var to = rewriteBuildDev ? 'RewriteBase /' + devdir + buildDir : 'RewriteBase /' + devdir;
 
     _logger.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
     var changedFiles = _replaceInFile2.default.sync({
       files: htaccess,
       from: /RewriteBase[\s]+.*/,
-      to: to
+      to: 'RewriteBase /' + devdir + (rewriteBuildDev ? buildDir : '')
     });
 
     if (!changedFiles.length) {
@@ -175,19 +170,34 @@ var PolymerBuild = function PolymerBuild() {
   };
 
   this.compressInlineIndex = function () {
-    var index = _this.args.buildDir + '/_index.html';
+    var buildDir = _this.args.buildDir;
+
+    var getInlineTag = function getInlineTag(html) {
+      return (/<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
+      );
+    };
+    var index = buildDir + '/_index.html';
 
     _logger.logger.log('Minify and compress <src inline> in ' + index + '...');
-    var html = _inlineSource2.default.sync(_path2.default.resolve(index), {
-      compress: true,
-      rootpath: _path2.default.resolve('./')
-    });
 
-    if (!html) {
-      throw new Error(index + ' not compressed');
+    try {
+      var html = _fs2.default.readFileSync(index).toString();
+      var match = getInlineTag(html);
+
+      while (match) {
+        var source = match[1];
+        var code = _fs2.default.readFileSync(buildDir + '/' + source).toString();
+        var minifiedCode = _uglifyEs2.default.minify(code).code;
+
+        html = html.replace('<script inline src="' + source + '"></script>', '<script>' + minifiedCode + '</script>');
+        match = getInlineTag(html);
+      }
+
+      _fs2.default.writeFileSync(index, html);
+      _logger.logger.log('Minify and compress <src inline> Ok!');
+    } catch (err) {
+      _logger.logger.error(err);
     }
-
-    _logger.logger.log('Minify and compress <src inline> Ok!');
   };
 
   this.run = function () {
@@ -245,7 +255,6 @@ var PolymerBuild = function PolymerBuild() {
 
 /**
  * Minify and compress src tags in index files.
- * @throws {Error} If no file is compressed.
  */
 
 
