@@ -130,13 +130,14 @@ export default class PolymerBuild {
    * update meta tags in index files.
    */
   modifyMetaBaseIndex = () => {
-    const index = `${this.args.buildDir}/_index.html`
+    const { devdir, buildDir, rewriteBuildDev } = this.args
+    const index = `${buildDir}/_index.html`
 
     logger.log(`Replace <meta base> of ${index}...`)
     const changedFiles = replace.sync({
       files: index,
       from: /base\shref="(.*)"/, // For local execution only.
-      to: `base href="https://www.usherbrooke.ca/${this.args.devdir}"`,
+      to: `base href="/${devdir}${rewriteBuildDev ? buildDir : ''}"`,
     })
 
     logger.log(`_index.html modified: ${!!changedFiles.length}`)
