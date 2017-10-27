@@ -101,15 +101,15 @@ var PolymerBuild = function PolymerBuild() {
 
   this.copyHtaccess = function () {
     var sourceHtaccess = 'htaccess.sample';
-    var htaccessSample = _this.args.buildDir + '/' + sourceHtaccess;
-    var htaccess = _this.args.buildDir + '/.htaccess';
+    var htaccessSample = _this.buildDir + '/' + sourceHtaccess;
+    var htaccess = _this.buildDir + '/.htaccess';
 
     if (!_fs2.default.existsSync(sourceHtaccess)) {
       throw new Error('Error, file ' + sourceHtaccess + ' not found.');
     }
 
-    _logger.logger.log('Copy of .htaccess.sample to ' + _this.args.buildDir + '...');
-    _cpx2.default.copySync(sourceHtaccess, _this.args.buildDir);
+    _logger.logger.log('Copy of .htaccess.sample to ' + _this.buildDir + '...');
+    _cpx2.default.copySync(sourceHtaccess, _this.buildDir);
 
     _logger.logger.log('Rename ' + htaccessSample + ' to ' + htaccess + '...');
     _fs2.default.renameSync(htaccessSample, htaccess);
@@ -123,17 +123,16 @@ var PolymerBuild = function PolymerBuild() {
 
   this.replaceRewriteHtaccess = function () {
     var _args = _this.args,
-        buildDir = _args.buildDir,
         devdir = _args.devdir,
         rewriteBuildDev = _args.rewriteBuildDev;
 
-    var htaccess = buildDir + '/.htaccess';
+    var htaccess = _this.buildDir + '/.htaccess';
 
     _logger.logger.log('Replacing the RewriteBase for ' + htaccess + ' ...');
     var changedFiles = _replaceInFile2.default.sync({
       files: htaccess,
       from: /RewriteBase[\s]+.*/,
-      to: 'RewriteBase /' + devdir + (rewriteBuildDev ? buildDir : '')
+      to: 'RewriteBase /' + devdir + (rewriteBuildDev ? _this.buildDir : '')
     });
 
     if (!changedFiles.length) {
@@ -146,23 +145,22 @@ var PolymerBuild = function PolymerBuild() {
   this.modifyMetaBaseIndex = function () {
     var _args2 = _this.args,
         devdir = _args2.devdir,
-        buildDir = _args2.buildDir,
         rewriteBuildDev = _args2.rewriteBuildDev;
 
-    var index = buildDir + '/_index.html';
+    var index = _this.buildDir + '/_index.html';
 
     _logger.logger.log('Replace <meta base> of ' + index + '...');
     var changedFiles = _replaceInFile2.default.sync({
       files: index,
       from: /base\shref="(.*)"/, // For local execution only.
-      to: 'base href="/' + devdir + (rewriteBuildDev ? buildDir : '') + '"'
+      to: 'base href="/' + devdir + (rewriteBuildDev ? _this.buildDir : '') + '"'
     });
 
     _logger.logger.log('_index.html modified: ' + !!changedFiles.length);
   };
 
   this.modifyInlineIndex = function () {
-    var index = _this.args.buildDir + '/_index.html';
+    var index = _this.buildDir + '/_index.html';
 
     _logger.logger.log('Replace <src inline=""> with <src inline> in ' + index + '...');
     _replaceInFile2.default.sync({
@@ -175,13 +173,11 @@ var PolymerBuild = function PolymerBuild() {
   };
 
   this.compressInlineIndex = function () {
-    var buildDir = _this.args.buildDir;
-
     var getInlineTag = function getInlineTag(html) {
       return (/<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
       );
     };
-    var index = buildDir + '/_index.html';
+    var index = _this.buildDir + '/_index.html';
 
     _logger.logger.log('Minify and compress <src inline> in ' + index + '...');
 
@@ -191,7 +187,7 @@ var PolymerBuild = function PolymerBuild() {
 
       while (match) {
         var source = match[1];
-        var code = _fs2.default.readFileSync(buildDir + '/' + source).toString();
+        var code = _fs2.default.readFileSync(_this.buildDir + '/' + source).toString();
         var minifiedCode = _uglifyEs2.default.minify(code).code;
 
         html = html.replace('<script inline src="' + source + '"></script>', '<script>' + minifiedCode + '</script>');

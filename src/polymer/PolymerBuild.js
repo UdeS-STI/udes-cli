@@ -84,15 +84,15 @@ export default class PolymerBuild {
    */
   copyHtaccess = () => {
     const sourceHtaccess = 'htaccess.sample'
-    const htaccessSample = `${this.args.buildDir}/${sourceHtaccess}`
-    const htaccess = `${this.args.buildDir}/.htaccess`
+    const htaccessSample = `${this.buildDir}/${sourceHtaccess}`
+    const htaccess = `${this.buildDir}/.htaccess`
 
     if (!fs.existsSync(sourceHtaccess)) {
       throw new Error(`Error, file ${sourceHtaccess} not found.`)
     }
 
-    logger.log(`Copy of .htaccess.sample to ${this.args.buildDir}...`)
-    cpx.copySync(sourceHtaccess, this.args.buildDir)
+    logger.log(`Copy of .htaccess.sample to ${this.buildDir}...`)
+    cpx.copySync(sourceHtaccess, this.buildDir)
 
     logger.log(`Rename ${htaccessSample} to ${htaccess}...`)
     fs.renameSync(htaccessSample, htaccess)
@@ -109,14 +109,14 @@ export default class PolymerBuild {
    * @throws {Error} If fails to update htaccess file.
    */
   replaceRewriteHtaccess = () => {
-    const { buildDir, devdir, rewriteBuildDev } = this.args
-    const htaccess = `${buildDir}/.htaccess`
+    const { devdir, rewriteBuildDev } = this.args
+    const htaccess = `${this.buildDir}/.htaccess`
 
     logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
     const changedFiles = replace.sync({
       files: htaccess,
       from: /RewriteBase[\s]+.*/,
-      to: `RewriteBase /${devdir}${rewriteBuildDev ? buildDir : ''}`,
+      to: `RewriteBase /${devdir}${rewriteBuildDev ? this.buildDir : ''}`,
     })
 
     if (!changedFiles.length) {
@@ -130,14 +130,14 @@ export default class PolymerBuild {
    * update meta tags in index files.
    */
   modifyMetaBaseIndex = () => {
-    const { devdir, buildDir, rewriteBuildDev } = this.args
-    const index = `${buildDir}/_index.html`
+    const { devdir, rewriteBuildDev } = this.args
+    const index = `${this.buildDir}/_index.html`
 
     logger.log(`Replace <meta base> of ${index}...`)
     const changedFiles = replace.sync({
       files: index,
       from: /base\shref="(.*)"/, // For local execution only.
-      to: `base href="/${devdir}${rewriteBuildDev ? buildDir : ''}"`,
+      to: `base href="/${devdir}${rewriteBuildDev ? this.buildDir : ''}"`,
     })
 
     logger.log(`_index.html modified: ${!!changedFiles.length}`)
@@ -147,7 +147,7 @@ export default class PolymerBuild {
    * Update src tags in index files.
    */
   modifyInlineIndex = () => {
-    const index = `${this.args.buildDir}/_index.html`
+    const index = `${this.buildDir}/_index.html`
 
     logger.log(`Replace <src inline=""> with <src inline> in ${index}...`)
     replace.sync({
@@ -163,9 +163,8 @@ export default class PolymerBuild {
    * Minify and compress src tags in index files.
    */
   compressInlineIndex = () => {
-    const { buildDir } = this.args
     const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
-    const index = `${buildDir}/_index.html`
+    const index = `${this.buildDir}/_index.html`
 
     logger.log(`Minify and compress <src inline> in ${index}...`)
 
@@ -175,7 +174,7 @@ export default class PolymerBuild {
 
       while (match) {
         const source = match[1]
-        const code = fs.readFileSync(`${buildDir}/${source}`).toString()
+        const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
         const minifiedCode = UglifyJS.minify(code).code
 
         html = html.replace(
