@@ -136,7 +136,7 @@ export default class PolymerBuild {
     logger.log(`Replace <meta base> of ${index}...`)
     const changedFiles = replace.sync({
       files: index,
-      from: /base\shref="(.*)"/, // For local execution only.
+      from: /base\shref="[\w/~-]*"/, // For local execution only.
       to: `base href="/${devdir}${rewriteBuildDev ? this.buildDir : ''}"`,
     })
 
@@ -163,7 +163,7 @@ export default class PolymerBuild {
    * Minify and compress src tags in index files.
    */
   compressInlineIndex = () => {
-    const getInlineTag = html => /<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
+    const getInlineTag = html => /<script inline src="([\w/~-]+.js)"><\/script>/.exec(html)
     const index = `${this.buildDir}/_index.html`
 
     logger.log(`Minify and compress <src inline> in ${index}...`)

@@ -152,7 +152,7 @@ var PolymerBuild = function PolymerBuild() {
     _logger.logger.log('Replace <meta base> of ' + index + '...');
     var changedFiles = _replaceInFile2.default.sync({
       files: index,
-      from: /base\shref="(.*)"/, // For local execution only.
+      from: /base\shref="[\w/~-]*"/, // For local execution only.
       to: 'base href="/' + devdir + (rewriteBuildDev ? _this.buildDir : '') + '"'
     });
 
@@ -174,7 +174,7 @@ var PolymerBuild = function PolymerBuild() {
 
   this.compressInlineIndex = function () {
     var getInlineTag = function getInlineTag(html) {
-      return (/<script inline src="([\w/-]+.js)"><\/script>/.exec(html)
+      return (/<script inline src="([\w/~-]+.js)"><\/script>/.exec(html)
       );
     };
     var index = _this.buildDir + '/_index.html';
