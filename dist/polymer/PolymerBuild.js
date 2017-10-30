@@ -204,6 +204,18 @@ var PolymerBuild = function PolymerBuild(args) {
     }
   };
 
+  this.removeIndexPhp = function () {
+    if (_fs2.default.existsSync(_this.buildDir + '/index.php')) {
+      _fs2.default.unlinkSync(_this.buildDir + '/index.php');
+    }
+  };
+
+  this.renameIndexHtml = function () {
+    if (_fs2.default.existsSync(_this.buildDir + '/_index.html')) {
+      _fs2.default.renameSync(_this.buildDir + '/_index.html', _this.buildDir + '/index.html');
+    }
+  };
+
   this.run = function () {
     if (_this.args.build) {
       _shelljs2.default.exec('polymer build');
@@ -214,14 +226,19 @@ var PolymerBuild = function PolymerBuild(args) {
         _this.buildDir = '' + _this.args.dir + buildName;
         _logger.logger.log('Build directory: ' + _this.buildDir);
 
-        if (_this.args.rewriteBuildDev) {
-          _this.copyHtaccess();
-          _this.replaceRewriteHtaccess();
-        }
-
         _this.modifyMetaBaseIndex();
         _this.modifyInlineIndex();
         _this.compressInlineIndex();
+
+        if (_this.args.rewriteBuildDev) {
+          // Dev environment
+          _this.copyHtaccess();
+          _this.replaceRewriteHtaccess();
+        } else {
+          // Production environment
+          _this.removeIndexPhp();
+          _this.renameIndexHtml();
+        }
       });
 
       process.exit(0);
@@ -268,6 +285,16 @@ var PolymerBuild = function PolymerBuild(args) {
 
 /**
  * Minify and compress src tags in index files.
+ */
+
+
+/**
+ * Delete index.php file from build directory.
+ */
+
+
+/**
+ * Rename _index.html file in build directory.
  */
 
 
