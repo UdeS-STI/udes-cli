@@ -187,6 +187,8 @@ export default class PolymerBuild {
           `<script inline src="${source}"></script>`,
           `<script>${minifiedCode}</script>`
         )
+
+        fs.unlinkSync(`${this.buildDir}/${source}`)
         match = getInlineTag(html)
       }
 
@@ -242,8 +244,6 @@ export default class PolymerBuild {
           this.renameIndexHtml()
         }
       })
-
-      process.exit(0)
     } catch (error) {
       logger.error(error)
       process.exit(1)

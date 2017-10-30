@@ -194,6 +194,8 @@ var PolymerBuild = function PolymerBuild(args) {
         var minifiedCode = _uglifyEs2.default.minify(code).code;
 
         html = html.replace('<script inline src="' + source + '"></script>', '<script>' + minifiedCode + '</script>');
+
+        _fs2.default.unlinkSync(_this.buildDir + '/' + source);
         match = getInlineTag(html);
       }
 
@@ -240,8 +242,6 @@ var PolymerBuild = function PolymerBuild(args) {
           _this.renameIndexHtml();
         }
       });
-
-      process.exit(0);
     } catch (error) {
       _logger.logger.error(error);
       process.exit(1);
