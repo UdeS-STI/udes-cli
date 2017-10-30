@@ -226,9 +226,11 @@ var PolymerBuild = function PolymerBuild() {
         _this.compressInlineIndex();
 
         if (_this.args.rewriteBuildDev) {
+          // Dev environment
           _this.copyHtaccess();
           _this.replaceRewriteHtaccess();
         } else {
+          // Production environment
           _this.removeIndexPhp();
           _this.renameIndexHtml();
         }
@@ -274,6 +276,16 @@ var PolymerBuild = function PolymerBuild() {
 
 /**
  * Minify and compress src tags in index files.
+ */
+
+
+/**
+ * Delete index.php file from build directory.
+ */
+
+
+/**
+ * Rename _index.html file in build directory.
  */
 
 
