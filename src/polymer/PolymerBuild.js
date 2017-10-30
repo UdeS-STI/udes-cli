@@ -191,6 +191,18 @@ export default class PolymerBuild {
     }
   }
 
+  removeIndexPhp = () => {
+    if (fs.existsSync(`${this.buildDir}/index.php`)) {
+      fs.unlinkSync(`${this.buildDir}/index.php`)
+    }
+  }
+
+  renameIndexHtml = () => {
+    if (fs.existsSync(`${this.buildDir}/_index.html`)) {
+      fs.renameSync(`${this.buildDir}/_index.html`, `${this.buildDir}/index.html`)
+    }
+  }
+
   /**
    * Execute code for building polymer project.
    */
@@ -202,14 +214,17 @@ export default class PolymerBuild {
         this.buildDir = `${this.args.dir}${buildName}`
         logger.log(`Build directory: ${this.buildDir}`)
 
-        if (this.args.rewriteBuildDev) {
-          this.copyHtaccess()
-          this.replaceRewriteHtaccess()
-        }
-
         this.modifyMetaBaseIndex()
         this.modifyInlineIndex()
         this.compressInlineIndex()
+
+        if (this.args.rewriteBuildDev) {
+          this.copyHtaccess()
+          this.replaceRewriteHtaccess()
+        } else {
+          this.removeIndexPhp()
+          this.renameIndexHtml()
+        }
       })
 
       process.exit(0)

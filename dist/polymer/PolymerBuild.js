@@ -201,6 +201,18 @@ var PolymerBuild = function PolymerBuild() {
     }
   };
 
+  this.removeIndexPhp = function () {
+    if (_fs2.default.existsSync(_this.buildDir + '/index.php')) {
+      _fs2.default.unlinkSync(_this.buildDir + '/index.php');
+    }
+  };
+
+  this.renameIndexHtml = function () {
+    if (_fs2.default.existsSync(_this.buildDir + '/_index.html')) {
+      _fs2.default.renameSync(_this.buildDir + '/_index.html', _this.buildDir + '/index.html');
+    }
+  };
+
   this.run = function () {
     _shelljs2.default.exec('polymer build');
 
@@ -209,14 +221,17 @@ var PolymerBuild = function PolymerBuild() {
         _this.buildDir = '' + _this.args.dir + buildName;
         _logger.logger.log('Build directory: ' + _this.buildDir);
 
-        if (_this.args.rewriteBuildDev) {
-          _this.copyHtaccess();
-          _this.replaceRewriteHtaccess();
-        }
-
         _this.modifyMetaBaseIndex();
         _this.modifyInlineIndex();
         _this.compressInlineIndex();
+
+        if (_this.args.rewriteBuildDev) {
+          _this.copyHtaccess();
+          _this.replaceRewriteHtaccess();
+        } else {
+          _this.removeIndexPhp();
+          _this.renameIndexHtml();
+        }
       });
 
       process.exit(0);

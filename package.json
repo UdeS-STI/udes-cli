@@ -1,6 +1,6 @@
 {
   "name": "udes-cli",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "CLI tools used at UdeS",
   "dependencies": {
     "cpx": "^1.5.0",
