@@ -34,7 +34,6 @@ var UdeSCLI = function UdeSCLI() {
 
     switch (command) {
       case 'polymer-build':
-        console.log('polymer-build');
         commandInstance = new _PolymerBuild2.default();
         commandInstance.run();
         break;

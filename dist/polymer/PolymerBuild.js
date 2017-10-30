@@ -55,7 +55,9 @@ var formatArguments = function formatArguments(args) {
     defaultBuildNames = ['bundled', 'unbundled', 'es5-bundled'];
   }
 
-  var _args$buildName = args.buildName,
+  var _args$build = args.build,
+      build = _args$build === undefined ? true : _args$build,
+      _args$buildName = args.buildName,
       buildName = _args$buildName === undefined ? defaultBuildNames : _args$buildName,
       _args$rewriteBuildDev = args.rewriteBuildDev,
       rewriteBuildDev = _args$rewriteBuildDev === undefined ? false : _args$rewriteBuildDev,
@@ -67,6 +69,7 @@ var formatArguments = function formatArguments(args) {
   }
 
   return {
+    build: build,
     buildNames: Array.isArray(buildName) ? buildName : [buildName],
     devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir: dir,
@@ -79,7 +82,7 @@ var formatArguments = function formatArguments(args) {
  * @class
  */
 
-var PolymerBuild = function PolymerBuild() {
+var PolymerBuild = function PolymerBuild(args) {
   var _this = this;
 
   _classCallCheck(this, PolymerBuild);
@@ -202,7 +205,9 @@ var PolymerBuild = function PolymerBuild() {
   };
 
   this.run = function () {
-    _shelljs2.default.exec('polymer build');
+    if (_this.args.build) {
+      _shelljs2.default.exec('polymer build');
+    }
 
     try {
       _this.args.buildNames.forEach(function (buildName) {
@@ -226,8 +231,12 @@ var PolymerBuild = function PolymerBuild() {
     }
   };
 
-  this.validateArgv();
-  this.args = formatArguments(this.argv);
+  if (!args) {
+    this.validateArgv();
+  } else if (!args.rootURI) {
+    throw new Error('Please provide rootURI argument to work with this build');
+  }
+  this.args = formatArguments(args || this.argv);
 }
 
 /**
