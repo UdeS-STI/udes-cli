@@ -11,14 +11,12 @@ development tasks. Once installed the included scripts can be added to your
 `package.json`.
 
 # Prerequisites
-* [Node](https://nodejs.org) 6.10.1 (it is recommended to install it via
+* [Node](https://nodejs.org) 6.10.1 or above (it is recommended to install it via
 [NVM](https://github.com/creationix/nvm))
-* Ensure you have a development environment setup to use the orchestrator.
-Since it uses a socket you cannot run it on a local machine.
 
 # Getting started
 ## Installation
-If you want to test or develop on the library simply urn these commands
+If you want to test or develop on the library simply run these commands
 ```bash
 git clone git@github.com:UdeS-STI/udes-cli.git
 cd udes-cli
@@ -30,7 +28,7 @@ ln -s `pwd` node_modules/udes-cli
 ## Add to project
 If you want to add the library to your project simply run
 ```bash
-npm install udes-cli
+npm install udes-cli -g --save
 ```
 
 Then, in the `script` section of your `package.json` you can add the commands
@@ -38,8 +36,7 @@ from the library
 ```json
 {
   "scripts": {
-    "polymer-build-dev": "polymer-build --buildName=bundled --rewriteBuildDev",
-    "polymer-build": "polymer-build --buildName=es6-bundled"
+    "build": "udes polymer-build -u=dir --buildName=bundled --rewriteBuildDev"
   }
 }
 ```
@@ -47,7 +44,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run polymer-build-dev -- --rootURI /path/to/project
+npm run udes polymer-build -- --rootURI /path/to/project
 ``` 
 
 # Documentation
@@ -58,15 +55,15 @@ TODO
 ```
 .
 ├── bin
-|   └── polymer
-|       └── polymer scripts
-├── dist
+|   └── udes (CLI entry point)
+├── dist 
 |   └── transpiled (es5) source files
 └── src
+    ├── UdeSCLI (main class, handles all CLI requests)
+    ├── lib (utility files)
     └── polymer
         └── polymer source files
 ```
-* Scripts must be added to `bin` directory in a related sub-directory.
 * Source files must be added to the `src` directory.
 * The `dist` directory contains files built from `babel-cli`.
 

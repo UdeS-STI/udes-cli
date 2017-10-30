@@ -1,7 +1,7 @@
 {
   "name": "udes-cli",
-  "version": "0.1.9",
-  "description": "Utility fonctions to use in npm script",
+  "version": "0.1.10",
+  "description": "CLI tools used at UdeS",
   "dependencies": {
     "cpx": "^1.5.0",
     "replace-in-file": "^2.5.3",
@@ -20,11 +20,10 @@
   "scripts": {
     "audit": "node_modules/.bin/nsp check",
     "build": "babel ./src --out-dir dist",
-    "lint": "eslint ./src; eslint ./bin",
-    "udes-polymer-build": "polymer-build"
+    "lint": "eslint ./src; eslint ./bin"
   },
   "bin": {
-    "polymer-build": "bin/polymer/polymer-build.js"
+    "udes": "bin/udes.js"
   },
   "repository": {
     "type": "git",
