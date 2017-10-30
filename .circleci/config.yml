@@ -22,3 +22,6 @@ jobs:
       - run:
           name: security-audit
           command: npm run audit
+      - run:
+          name: unit-tests
+          command: npm run test
