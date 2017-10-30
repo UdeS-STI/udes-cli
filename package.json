@@ -1,12 +1,12 @@
 {
   "name": "udes-cli",
-  "version": "0.1.8",
-  "description": "Utility fonctions to use in npm script",
+  "version": "0.1.10",
+  "description": "CLI tools used at UdeS",
   "dependencies": {
     "cpx": "^1.5.0",
-    "inline-source-cli": "^1.2.0",
     "replace-in-file": "^2.5.3",
     "shelljs": "0.7.8",
+    "uglify-es": "^3.1.5",
     "yargs": "9.0.1"
   },
   "devDependencies": {
@@ -18,19 +18,21 @@
     "chai": "^4.1.2",
     "eslint-config-udes": "^0.1.5",
     "mocha": "^4.0.1",
+    "nsp": "2.8.1",
     "nyc": "^11.2.1",
     "sinon": "^4.0.2",
     "sinon-chai": "^2.14.0"
   },
   "scripts": {
+    "audit": "node_modules/.bin/nsp check",
     "build": "babel ./src --out-dir dist",
     "coverage": "NODE_ENV=test node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
     "lint": "eslint ./src; eslint ./bin",
     "test": "NODE_ENV=test mocha --compilers js:babel-core/register --opts ../mocha.opts ./src/**/**Test.js",
-    "udes-polymer-build": "polymer-build"
+    "udes-polymer-build": "udes polymer-build"
   },
   "bin": {
-    "polymer-build": "bin/polymer/polymer-build.js"
+    "udes": "bin/udes.js"
   },
   "repository": {
     "type": "git",
