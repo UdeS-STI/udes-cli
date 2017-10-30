@@ -192,6 +192,24 @@ export default class PolymerBuild {
   }
 
   /**
+   * Delete index.php file from build directory.
+   */
+  removeIndexPhp = () => {
+    if (fs.existsSync(`${this.buildDir}/index.php`)) {
+      fs.unlinkSync(`${this.buildDir}/index.php`)
+    }
+  }
+
+  /**
+   * Rename _index.html file in build directory.
+   */
+  renameIndexHtml = () => {
+    if (fs.existsSync(`${this.buildDir}/_index.html`)) {
+      fs.renameSync(`${this.buildDir}/_index.html`, `${this.buildDir}/index.html`)
+    }
+  }
+
+  /**
    * Execute code for building polymer project.
    */
   run = () => {
@@ -202,14 +220,19 @@ export default class PolymerBuild {
         this.buildDir = `${this.args.dir}${buildName}`
         logger.log(`Build directory: ${this.buildDir}`)
 
-        if (this.args.rewriteBuildDev) {
-          this.copyHtaccess()
-          this.replaceRewriteHtaccess()
-        }
-
         this.modifyMetaBaseIndex()
         this.modifyInlineIndex()
         this.compressInlineIndex()
+
+        if (this.args.rewriteBuildDev) {
+          // Dev environment
+          this.copyHtaccess()
+          this.replaceRewriteHtaccess()
+        } else {
+          // Production environment
+          this.removeIndexPhp()
+          this.renameIndexHtml()
+        }
       })
 
       process.exit(0)
