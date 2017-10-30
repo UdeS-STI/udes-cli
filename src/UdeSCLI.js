@@ -28,7 +28,6 @@ export default class UdeSCLI {
 
     switch (command) {
       case 'polymer-build':
-        console.log('polymer-build')
         commandInstance = new PolymerBuild()
         commandInstance.run()
         break
