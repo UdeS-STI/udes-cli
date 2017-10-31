@@ -72,6 +72,7 @@ var formatArguments = function formatArguments(args) {
 /**
  * Class to handle actions related to building a polymer project.
  * @class
+ * @params {Object} [args] - Build arguments when not using command line.
  */
 
 var PolymerBuild = function PolymerBuild(args) {
@@ -94,7 +95,7 @@ var PolymerBuild = function PolymerBuild(args) {
     }).array('buildName').demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build').help('h').alias('h', 'help').argv;
   };
 
-  this.hanldeHtaccess = function () {
+  this.handleHtaccess = function () {
     _logger.logger.log('Copy of .htaccess.sample to ' + _this.buildDir + '/.htaccess ...');
     var _args = _this.args,
         devdir = _args.devdir,
@@ -168,7 +169,7 @@ var PolymerBuild = function PolymerBuild(args) {
 
     if (_this.args.rewriteBuildDev) {
       // Dev environment
-      _this.hanldeHtaccess();
+      _this.handleHtaccess();
     } else {
       // Production environment
       _this.removeIndexPhp();
@@ -203,12 +204,27 @@ var PolymerBuild = function PolymerBuild(args) {
 
 
 /**
- * Copy sample htaccess file to the build directory.
+ * Copy sample htaccess file to the build
+ * directory and replace RewriteBase entry.
  */
 
 
 /**
- * Minify and compress src tags in index files.
+ * Replace base tag's href property.
+ * @param {String} html - HTML string.
+ * @returns {string} HTML with replaced base tag.
+ */
+
+
+/**
+ * Replace script tags with inline JavaScript.
+ * @param {String} html - HTML string.
+ * @returns {string} HTML with replaced base tag.
+ */
+
+
+/**
+ * Refactor _index.html files.
  */
 
 
@@ -219,6 +235,12 @@ var PolymerBuild = function PolymerBuild(args) {
 
 /**
  * Rename _index.html file in build directory.
+ */
+
+
+/**
+ * Update build files depending on environment settings.
+ * @param {String} buildName - Build name from arguments or polymer config.
  */
 
 

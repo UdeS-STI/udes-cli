@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 const debug = true
 const loggerType = {
   DEBUG: {

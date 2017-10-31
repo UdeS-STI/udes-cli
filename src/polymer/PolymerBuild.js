@@ -44,6 +44,7 @@ const formatArguments = (args) => {
 /**
  * Class to handle actions related to building a polymer project.
  * @class
+ * @params {Object} [args] - Build arguments when not using command line.
  */
 export default class PolymerBuild {
   constructor (args) {
@@ -82,9 +83,10 @@ export default class PolymerBuild {
   }
 
   /**
-   * Copy sample htaccess file to the build directory.
+   * Copy sample htaccess file to the build
+   * directory and replace RewriteBase entry.
    */
-  hanldeHtaccess = () => {
+  handleHtaccess = () => {
     logger.log(`Copy of .htaccess.sample to ${this.buildDir}/.htaccess ...`)
     const { devdir, rewriteBuildDev } = this.args
     let sample = fs.readFileSync('htaccess.sample').toString()
@@ -99,6 +101,11 @@ export default class PolymerBuild {
     logger.log('Copy completed!')
   }
 
+  /**
+   * Replace base tag's href property.
+   * @param {String} html - HTML string.
+   * @returns {string} HTML with replaced base tag.
+   */
   modifyMetaBase = (html) => {
     const { devdir, rewriteBuildDev } = this.args
     return html.replace(
@@ -107,6 +114,11 @@ export default class PolymerBuild {
     )
   }
 
+  /**
+   * Replace script tags with inline JavaScript.
+   * @param {String} html - HTML string.
+   * @returns {string} HTML with replaced base tag.
+   */
   inlineJs = (html) => {
     const getInlineTag = string => /<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
     let string = html
@@ -129,7 +141,7 @@ export default class PolymerBuild {
   }
 
   /**
-   * Minify and compress src tags in index files.
+   * Refactor _index.html files.
    */
   handleIndexFile = () => {
     const index = `${this.buildDir}/_index.html`
@@ -159,6 +171,10 @@ export default class PolymerBuild {
     }
   }
 
+  /**
+   * Update build files depending on environment settings.
+   * @param {String} buildName - Build name from arguments or polymer config.
+   */
   handleBuild = (buildName) => {
     this.buildDir = `${this.args.dir}${buildName}`
     logger.log(`Build directory: ${this.buildDir}`)
@@ -167,7 +183,7 @@ export default class PolymerBuild {
 
     if (this.args.rewriteBuildDev) {
       // Dev environment
-      this.hanldeHtaccess()
+      this.handleHtaccess()
     } else {
       // Production environment
       this.removeIndexPhp()
