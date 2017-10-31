@@ -6,25 +6,24 @@ import yargs from 'yargs'
 import { logger } from '../lib/logger'
 
 /**
+ * Get build names from polymer config file.
+ * @private
+ * @returns {[String]} List of build names.
+ */
+const getDefaultBuildNames = () =>
+  JSON.parse(fs.readFileSync('polymer.json')).builds.map(({ name, preset }) => name || preset)
+
+/**
  * Converts command line arguments into a usable object.
  * @private
  * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
 const formatArguments = (args) => {
-  let defaultBuildNames
   const dir = 'build/'
-
-  try {
-    const polymerConfig = JSON.parse(fs.readFileSync(`${dir}polymer.json`))
-    defaultBuildNames = polymerConfig.builds.map(({ name, preset }) => name || preset)
-  } catch (err) {
-    defaultBuildNames = ['bundled', 'unbundled', 'es5-bundled']
-  }
-
   const {
     build = true,
-    buildName = defaultBuildNames,
+    buildName = getDefaultBuildNames(),
     rewriteBuildDev = false,
     rootURI,
   } = args
@@ -135,14 +134,11 @@ export default class PolymerBuild {
   handleIndexFile = () => {
     const index = `${this.buildDir}/_index.html`
 
-    logger.log(`Minify and compress <src inline> in ${index}...`)
-
     let html = fs.readFileSync(index).toString()
     html = this.modifyMetaBase(html)
     html = this.inlineJs(html)
 
     fs.writeFileSync(index, html)
-    logger.log('Minify and compress <src inline> Ok!')
   }
 
   /**

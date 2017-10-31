@@ -27,30 +27,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
+ * Get build names from polymer config file.
+ * @private
+ * @returns {[String]} List of build names.
+ */
+var getDefaultBuildNames = function getDefaultBuildNames() {
+  return JSON.parse(_fs2.default.readFileSync('polymer.json')).builds.map(function (_ref) {
+    var name = _ref.name,
+        preset = _ref.preset;
+    return name || preset;
+  });
+};
+
+/**
  * Converts command line arguments into a usable object.
  * @private
  * @param {[String]} args - Arguments passed through command line.
  * @returns {Object} Arguments in a formatted object.
  */
 var formatArguments = function formatArguments(args) {
-  var defaultBuildNames = void 0;
   var dir = 'build/';
-
-  try {
-    var polymerConfig = JSON.parse(_fs2.default.readFileSync(dir + 'polymer.json'));
-    defaultBuildNames = polymerConfig.builds.map(function (_ref) {
-      var name = _ref.name,
-          preset = _ref.preset;
-      return name || preset;
-    });
-  } catch (err) {
-    defaultBuildNames = ['bundled', 'unbundled', 'es5-bundled'];
-  }
-
   var _args$build = args.build,
       build = _args$build === undefined ? true : _args$build,
       _args$buildName = args.buildName,
-      buildName = _args$buildName === undefined ? defaultBuildNames : _args$buildName,
+      buildName = _args$buildName === undefined ? getDefaultBuildNames() : _args$buildName,
       _args$rewriteBuildDev = args.rewriteBuildDev,
       rewriteBuildDev = _args$rewriteBuildDev === undefined ? false : _args$rewriteBuildDev,
       rootURI = args.rootURI;
@@ -141,14 +141,11 @@ var PolymerBuild = function PolymerBuild(args) {
   this.handleIndexFile = function () {
     var index = _this.buildDir + '/_index.html';
 
-    _logger.logger.log('Minify and compress <src inline> in ' + index + '...');
-
     var html = _fs2.default.readFileSync(index).toString();
     html = _this.modifyMetaBase(html);
     html = _this.inlineJs(html);
 
     _fs2.default.writeFileSync(index, html);
-    _logger.logger.log('Minify and compress <src inline> Ok!');
   };
 
   this.removeIndexPhp = function () {
