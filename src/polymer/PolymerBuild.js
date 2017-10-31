@@ -24,6 +24,7 @@ const getDefaultBuildNames = () =>
 const formatArguments = (args) => {
   const dir = 'build/'
   const {
+    build = true,
     buildName = getDefaultBuildNames(),
     rewriteBuildDev = false,
     rootURI,
@@ -34,6 +35,7 @@ const formatArguments = (args) => {
   }
 
   return {
+    build,
     buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
     devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir,
@@ -46,9 +48,13 @@ const formatArguments = (args) => {
  * @class
  */
 export default class PolymerBuild {
-  constructor () {
-    this.validateArgv()
-    this.args = formatArguments(this.argv)
+  constructor (args) {
+    if (!args) {
+      this.validateArgv()
+    } else if (!args.rootURI) {
+      throw new Error('Please provide rootURI argument to work with this build')
+    }
+    this.args = formatArguments(args || this.argv)
   }
 
   /**
@@ -180,6 +186,8 @@ export default class PolymerBuild {
           `<script inline src="${source}"></script>`,
           `<script>${minifiedCode}</script>`
         )
+
+        fs.unlinkSync(`${this.buildDir}/${source}`)
         match = getInlineTag(html)
       }
 
@@ -212,7 +220,9 @@ export default class PolymerBuild {
    * Execute code for building polymer project.
    */
   run = () => {
-    shell.exec('polymer build')
+    if (this.args.build) {
+      shell.exec('polymer build')
+    }
 
     try {
       this.args.buildNames.forEach((buildName) => {
@@ -233,8 +243,6 @@ export default class PolymerBuild {
           this.renameIndexHtml()
         }
       })
-
-      process.exit(0)
     } catch (error) {
       logger.error(error)
       process.exit(1)

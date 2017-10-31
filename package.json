@@ -12,15 +12,24 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.1",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
+    "chai": "^4.1.2",
     "eslint-config-udes": "^0.1.5",
-    "nsp": "2.8.1"
+    "mocha": "^4.0.1",
+    "nsp": "2.8.1",
+    "nyc": "^11.2.1",
+    "sinon": "^4.0.2",
+    "sinon-chai": "^2.14.0"
   },
   "scripts": {
     "audit": "node_modules/.bin/nsp check",
-    "build": "babel ./src --out-dir dist",
-    "lint": "eslint ./src; eslint ./bin"
+    "build": "babel ./src --out-dir dist --ignore '**/*Test.js'",
+    "coverage": "NODE_ENV=test node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
+    "lint": "eslint ./src; eslint ./bin",
+    "test": "NODE_ENV=test mocha --compilers js:babel-core/register --opts ../mocha.opts ./src/**/**Test.js",
+    "udes-polymer-build": "udes polymer-build"
   },
   "bin": {
     "udes": "bin/udes.js"
