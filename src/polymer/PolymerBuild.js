@@ -1,6 +1,4 @@
-import cpx from 'cpx'
 import fs from 'fs'
-import replace from 'replace-in-file'
 import shell from 'shelljs'
 import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
@@ -86,117 +84,65 @@ export default class PolymerBuild {
 
   /**
    * Copy sample htaccess file to the build directory.
-   * @throws {Error} If copy fails.
    */
-  copyHtaccess = () => {
-    const sourceHtaccess = 'htaccess.sample'
-    const htaccessSample = `${this.buildDir}/${sourceHtaccess}`
-    const htaccess = `${this.buildDir}/.htaccess`
-
-    if (!fs.existsSync(sourceHtaccess)) {
-      throw new Error(`Error, file ${sourceHtaccess} not found.`)
-    }
-
-    logger.log(`Copy of .htaccess.sample to ${this.buildDir}...`)
-    cpx.copySync(sourceHtaccess, this.buildDir)
-
-    logger.log(`Rename ${htaccessSample} to ${htaccess}...`)
-    fs.renameSync(htaccessSample, htaccess)
-
-    if (!fs.existsSync(htaccess)) {
-      throw new Error(`Error, file ${htaccess} not found`)
-    }
-
-    logger.log('Rename completed!')
-  }
-
-  /**
-   * Update RewriteBase info in htaccess file.
-   * @throws {Error} If fails to update htaccess file.
-   */
-  replaceRewriteHtaccess = () => {
+  hanldeHtaccess = () => {
+    logger.log(`Copy of .htaccess.sample to ${this.buildDir}/.htaccess ...`)
     const { devdir, rewriteBuildDev } = this.args
-    const htaccess = `${this.buildDir}/.htaccess`
+    let sample = fs.readFileSync('htaccess.sample').toString()
 
-    logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
-    const changedFiles = replace.sync({
-      files: htaccess,
-      from: /RewriteBase[\s]+.*/,
-      to: `RewriteBase /${devdir}${rewriteBuildDev ? this.buildDir : ''}`,
-    })
+    sample = sample.replace(
+      /RewriteBase[\s]+.*/,
+      `RewriteBase /${devdir}${rewriteBuildDev ? this.buildDir : ''}`
+    )
 
-    if (!changedFiles.length) {
-      throw new Error('.htaccess not modified')
+    fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
+
+    logger.log('Copy completed!')
+  }
+
+  modifyMetaBase = (html) => {
+    const { devdir, rewriteBuildDev } = this.args
+    return html.replace(
+      /base\shref="[\w/~-]*"/,
+      `base href="/${devdir}${rewriteBuildDev ? this.buildDir : ''}"`
+    )
+  }
+
+  inlineJs = (html) => {
+    const getInlineTag = string => /<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
+    let string = html
+    let match = getInlineTag(string)
+
+    while (match) {
+      const source = match[2]
+      const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
+
+      string = string.replace(
+        new RegExp(`<script inline(="")? src="${source}"></script>`),
+        `<script>${UglifyJS.minify(code).code}</script>`
+      )
+
+      fs.unlinkSync(`${this.buildDir}/${source}`)
+      match = getInlineTag(string)
     }
 
-    logger.log('.htaccess modified!')
-  }
-
-  /**
-   * update meta tags in index files.
-   */
-  modifyMetaBaseIndex = () => {
-    const { devdir, rewriteBuildDev } = this.args
-    const index = `${this.buildDir}/_index.html`
-
-    logger.log(`Replace <meta base> of ${index}...`)
-    const changedFiles = replace.sync({
-      files: index,
-      from: /base\shref="[\w/~-]*"/, // For local execution only.
-      to: `base href="/${devdir}${rewriteBuildDev ? this.buildDir : ''}"`,
-    })
-
-    logger.log(`_index.html modified: ${!!changedFiles.length}`)
-  }
-
-  /**
-   * Update src tags in index files.
-   */
-  modifyInlineIndex = () => {
-    const index = `${this.buildDir}/_index.html`
-
-    logger.log(`Replace <src inline=""> with <src inline> in ${index}...`)
-    replace.sync({
-      files: index,
-      from: /inline=""/g,
-      to: 'inline',
-    })
-
-    logger.log(`Replace <src inline> Ok!`)
+    return string
   }
 
   /**
    * Minify and compress src tags in index files.
    */
-  compressInlineIndex = () => {
-    const getInlineTag = html => /<script inline src="([\w/~-]+.js)"><\/script>/.exec(html)
+  handleIndexFile = () => {
     const index = `${this.buildDir}/_index.html`
 
     logger.log(`Minify and compress <src inline> in ${index}...`)
 
-    try {
-      let html = fs.readFileSync(index).toString()
-      let match = getInlineTag(html)
+    let html = fs.readFileSync(index).toString()
+    html = this.modifyMetaBase(html)
+    html = this.inlineJs(html)
 
-      while (match) {
-        const source = match[1]
-        const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
-        const minifiedCode = UglifyJS.minify(code).code
-
-        html = html.replace(
-          `<script inline src="${source}"></script>`,
-          `<script>${minifiedCode}</script>`
-        )
-
-        fs.unlinkSync(`${this.buildDir}/${source}`)
-        match = getInlineTag(html)
-      }
-
-      fs.writeFileSync(index, html)
-      logger.log('Minify and compress <src inline> Ok!')
-    } catch (err) {
-      logger.error(err)
-    }
+    fs.writeFileSync(index, html)
+    logger.log('Minify and compress <src inline> Ok!')
   }
 
   /**
@@ -217,6 +163,22 @@ export default class PolymerBuild {
     }
   }
 
+  handleBuild = (buildName) => {
+    this.buildDir = `${this.args.dir}${buildName}`
+    logger.log(`Build directory: ${this.buildDir}`)
+
+    this.handleIndexFile()
+
+    if (this.args.rewriteBuildDev) {
+      // Dev environment
+      this.hanldeHtaccess()
+    } else {
+      // Production environment
+      this.removeIndexPhp()
+      this.renameIndexHtml()
+    }
+  }
+
   /**
    * Execute code for building polymer project.
    */
@@ -226,24 +188,7 @@ export default class PolymerBuild {
     }
 
     try {
-      this.args.buildNames.forEach((buildName) => {
-        this.buildDir = `${this.args.dir}${buildName}`
-        logger.log(`Build directory: ${this.buildDir}`)
-
-        this.modifyMetaBaseIndex()
-        this.modifyInlineIndex()
-        this.compressInlineIndex()
-
-        if (this.args.rewriteBuildDev) {
-          // Dev environment
-          this.copyHtaccess()
-          this.replaceRewriteHtaccess()
-        } else {
-          // Production environment
-          this.removeIndexPhp()
-          this.renameIndexHtml()
-        }
-      })
+      this.args.buildNames.forEach(this.handleBuild)
     } catch (error) {
       logger.error(error)
       process.exit(1)
