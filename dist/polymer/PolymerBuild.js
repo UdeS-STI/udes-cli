@@ -67,8 +67,8 @@ var formatArguments = function formatArguments(args) {
     baseURI: baseURI,
     build: build,
     buildNames: Array.isArray(buildNames) ? buildNames : [buildNames],
-    dir: dir,
-    copyHtaccessSample: copyHtaccessSample
+    copyHtaccessSample: copyHtaccessSample,
+    dir: dir
   };
 };
 
@@ -76,7 +76,7 @@ var formatArguments = function formatArguments(args) {
  * Class to handle actions related to building a polymer project.
  * @class
  * @params {Object} [args] - Build arguments when not using command line.
- * @params {Boolean} [args.addBuildDir = false] - Append buildDir to base href and Rewritebase if true.
+ * @params {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
  * @params {String} args.baseURI - HTML base URI for href values.
  * @params {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
  * @params {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
@@ -93,22 +93,22 @@ var PolymerBuild = function PolymerBuild(args) {
       alias: 'a',
       describe: 'Append buildDir to base href and Rewritebase if true',
       default: false
+    }).option('baseURI', {
+      alias: 'u',
+      describe: 'HTML base URI for href values'
     }).option('build', {
       alias: 'b',
       describe: 'Execute `polymer build` command before executing script if true',
       default: true
-    }).option('copyHtaccessSample', {
-      alias: 'c',
-      describe: 'Copy of htaccess for build dir if true',
-      default: false
     }).option('buildNames', {
       alias: 'n',
       describe: 'List of build packages',
       choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
       type: 'array'
-    }).option('baseURI', {
-      alias: 'u',
-      describe: 'HTML base URI for href values'
+    }).option('copyHtaccessSample', {
+      alias: 'c',
+      describe: 'Copy of htaccess for build dir if true',
+      default: false
     }).array('buildNames').demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build').help('h').alias('h', 'help').argv;
   };
 
@@ -142,6 +142,7 @@ var PolymerBuild = function PolymerBuild(args) {
   };
 
   this.inlineJs = function (html) {
+    var SOURCE_MATCH = 2;
     var getInlineTag = function getInlineTag(string) {
       return (/<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
       );
@@ -150,7 +151,7 @@ var PolymerBuild = function PolymerBuild(args) {
     var match = getInlineTag(string);
 
     while (match) {
-      var source = match[2];
+      var source = match[SOURCE_MATCH];
       var code = _fs2.default.readFileSync(_this.buildDir + '/' + source).toString();
 
       string = string.replace(new RegExp('<script inline(="")? src="' + source + '"></script>'), '<script>' + _uglifyEs2.default.minify(code).code + '</script>');
