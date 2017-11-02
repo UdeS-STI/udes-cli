@@ -61,7 +61,7 @@ describe('PolymerBuild', () => {
       const options = {
         build: false,
         buildNames: ['bundled'],
-        baseURI: '/src',
+        baseURI: 'src/',
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
@@ -79,7 +79,7 @@ describe('PolymerBuild', () => {
         build: false,
         buildNames: ['bundled'],
         rewriteBuildDev: true,
-        baseURI: '/src',
+        baseURI: 'src/',
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
