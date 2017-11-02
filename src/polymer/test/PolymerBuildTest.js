@@ -77,6 +77,7 @@ describe('PolymerBuild', () => {
     it('should create build for dev', () => {
       const options = {
         addBuildDir: true,
+        addBuildName: true,
         baseURI: '/src/',
         build: false,
         buildNames: ['bundled'],

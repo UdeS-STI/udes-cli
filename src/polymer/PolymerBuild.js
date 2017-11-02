@@ -23,6 +23,7 @@ const formatArguments = (args) => {
   const dir = 'build/'
   const {
     addBuildDir = false,
+    addBuildName = false,
     baseURI,
     build = true,
     buildNames = getDefaultBuildNames(),
@@ -35,6 +36,7 @@ const formatArguments = (args) => {
 
   return {
     addBuildDir,
+    addBuildName,
     baseURI,
     build,
     buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
@@ -79,6 +81,10 @@ export default class PolymerBuild {
         describe: 'Append buildDir to base href and Rewritebase if true',
         default: false,
       })
+      .option('addBuildName', {
+        describe: 'Append build name to base href and Rewritebase if true',
+        default: false,
+      })
       .option('baseURI', {
         alias: 'u',
         describe: 'HTML base URI for href values',
@@ -111,19 +117,18 @@ export default class PolymerBuild {
    * directory and replace RewriteBase entry.
    */
   formatHtaccess = () => {
-    logger.log(`Copy of .htaccess.sample to ${this.buildDir}/.htaccess ...`)
-    const sampleDir = 'htaccess.sample'
-    const { addBuildDir, baseURI } = this.args
+    const sampleFile = 'htaccess.sample'
+    logger.log(`Copy of ${sampleFile} to ${this.buildDir}.htaccess ...`)
 
-    if (!fs.existsSync(sampleDir)) {
-      throw Error('Sample htaccess file not found')
+    if (!fs.existsSync(sampleFile)) {
+      throw Error(`${sampleFile} file not found`)
     }
 
-    let sample = fs.readFileSync('htaccess.sample').toString()
+    let sample = fs.readFileSync(sampleFile).toString()
 
     sample = sample.replace(
       /RewriteBase[\s]+.*/,
-      `RewriteBase ${baseURI}${addBuildDir ? this.buildDir : ''}`
+      `RewriteBase ${this.baseURL}`
     )
 
     fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
@@ -137,10 +142,9 @@ export default class PolymerBuild {
    * @returns {string} HTML with replaced base tag.
    */
   modifyMetaBase = (html) => {
-    const { addBuildDir, baseURI } = this.args
     return html.replace(
       /base\shref="[\w/~-]*"/,
-      `base href="${baseURI}${addBuildDir ? this.buildDir : ''}"`
+      `base href="${this.baseURL}"`
     )
   }
 
@@ -198,11 +202,38 @@ export default class PolymerBuild {
   }
 
   /**
+   * Return the base URL.
+   * @param {String} buildName - Build name from arguments or polymer config.
+   * @return {String} Base URL.
+   */
+  getBaseURL = (buildName) => {
+    const {
+      addBuildDir,
+      addBuildName,
+      baseURI,
+      dir,
+    } = this.args
+
+    let baseURL = baseURI
+
+    if (addBuildDir) {
+      baseURL += dir
+    }
+
+    if (addBuildName) {
+      baseURL += `${buildName}/`
+    }
+
+    return baseURL
+  }
+
+  /**
    * Update build files depending on environment settings.
    * @param {String} buildName - Build name from arguments or polymer config.
    */
   updateBuildFiles = (buildName) => {
     this.buildDir = `${this.args.dir}${buildName}/`
+    this.baseURL = this.getBaseURL(buildName)
     logger.log(`Build directory: ${this.buildDir}`)
 
     this.formatIndexHtml()
