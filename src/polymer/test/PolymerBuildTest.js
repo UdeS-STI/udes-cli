@@ -89,9 +89,9 @@ describe('PolymerBuild', () => {
       const indexPhp = fs.readFileSync('build/bundled/index.php').toString()
       const htaccess = fs.readFileSync('build/bundled/.htaccess').toString()
 
-      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
+      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled/" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
       expect(indexPhp).to.be.equal('<?php echo "This is a PHP file"; ?>\n')
-      expect(htaccess).to.be.equal('RewriteBase /src/build/bundled\n')
+      expect(htaccess).to.be.equal('RewriteBase /src/build/bundled/\n')
       expect(fs.existsSync('build/bundled/script.js')).to.be.false
     })
   })

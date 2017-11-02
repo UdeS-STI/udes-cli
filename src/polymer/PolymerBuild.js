@@ -202,7 +202,7 @@ export default class PolymerBuild {
    * @param {String} buildName - Build name from arguments or polymer config.
    */
   updateBuildFiles = (buildName) => {
-    this.buildDir = `${this.args.dir}${buildName}`
+    this.buildDir = `${this.args.dir}${buildName}/`
     logger.log(`Build directory: ${this.buildDir}`)
 
     this.formatIndexHtml()
