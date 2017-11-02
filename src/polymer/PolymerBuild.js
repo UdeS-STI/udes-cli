@@ -38,8 +38,8 @@ const formatArguments = (args) => {
     baseURI,
     build,
     buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
-    dir,
     copyHtaccessSample,
+    dir,
   }
 }
 
@@ -79,15 +79,14 @@ export default class PolymerBuild {
         describe: 'Append buildDir to base href and Rewritebase if true',
         default: false,
       })
+      .option('baseURI', {
+        alias: 'u',
+        describe: 'HTML base URI for href values',
+      })
       .option('build', {
         alias: 'b',
         describe: 'Execute `polymer build` command before executing script if true',
         default: true,
-      })
-      .option('copyHtaccessSample', {
-        alias: 'c',
-        describe: 'Copy of htaccess for build dir if true',
-        default: false,
       })
       .option('buildNames', {
         alias: 'n',
@@ -95,9 +94,10 @@ export default class PolymerBuild {
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
         type: 'array',
       })
-      .option('baseURI', {
-        alias: 'u',
-        describe: 'HTML base URI for href values',
+      .option('copyHtaccessSample', {
+        alias: 'c',
+        describe: 'Copy of htaccess for build dir if true',
+        default: false,
       })
       .array('buildNames')
       .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
@@ -150,12 +150,13 @@ export default class PolymerBuild {
    * @returns {string} HTML with replaced base tag.
    */
   inlineJs = (html) => {
+    const SOURCE_MATCH = 2
     const getInlineTag = string => /<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
     let string = html
     let match = getInlineTag(string)
 
     while (match) {
-      const source = match[2]
+      const source = match[SOURCE_MATCH]
       const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
 
       string = string.replace(
