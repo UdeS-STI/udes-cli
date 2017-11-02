@@ -140,7 +140,7 @@ var PolymerBuild = function PolymerBuild(args) {
   };
 
   this.handleIndexFile = function () {
-    var index = _this.buildDir + '/_index.html';
+    var index = _this.buildDir + '/index.html';
 
     var html = _fs2.default.readFileSync(index).toString();
     html = _this.modifyMetaBase(html);
@@ -156,8 +156,8 @@ var PolymerBuild = function PolymerBuild(args) {
   };
 
   this.renameIndexHtml = function () {
-    if (_fs2.default.existsSync(_this.buildDir + '/_index.html')) {
-      _fs2.default.renameSync(_this.buildDir + '/_index.html', _this.buildDir + '/index.html');
+    if (_fs2.default.existsSync(_this.buildDir + '/index.html')) {
+      _fs2.default.renameSync(_this.buildDir + '/index.html', _this.buildDir + '/index.html');
     }
   };
 
@@ -224,7 +224,7 @@ var PolymerBuild = function PolymerBuild(args) {
 
 
 /**
- * Refactor _index.html files.
+ * Refactor index.html files.
  */
 
 
@@ -234,7 +234,7 @@ var PolymerBuild = function PolymerBuild(args) {
 
 
 /**
- * Rename _index.html file in build directory.
+ * Rename index.html file in build directory.
  */
 
 

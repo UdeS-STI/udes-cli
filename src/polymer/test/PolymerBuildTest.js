@@ -6,7 +6,7 @@ import fs from 'fs'
 
 import PolymerBuild from './../PolymerBuild'
 
-const files = ['_index.html', 'index.php', 'script.js']
+const files = ['index.html', 'index.php', 'script.js']
 const deleteFolderRecursive = (path) => {
   fs.readdirSync(path).forEach((file) => {
     const currentPath = `${path}/${file}`
@@ -84,7 +84,7 @@ describe('PolymerBuild', () => {
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
 
-      const indexHtml = fs.readFileSync('build/bundled/_index.html').toString()
+      const indexHtml = fs.readFileSync('build/bundled/index.html').toString()
       const indexPhp = fs.readFileSync('build/bundled/index.php').toString()
       const htaccess = fs.readFileSync('build/bundled/.htaccess').toString()
 

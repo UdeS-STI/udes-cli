@@ -150,7 +150,7 @@ export default class PolymerBuild {
    * Refactor index.html files.
    */
   handleIndexFile = () => {
-    const index = `${this.buildDir}/_index.html`
+    const index = `${this.buildDir}/index.html`
 
     if (!fs.existsSync(index)) {
       const error = `${index} file not found`
@@ -198,7 +198,6 @@ export default class PolymerBuild {
     } else {
       // Production environment
       this.removeIndexPhp()
-      this.renameIndexHtml()
     }
   }
 
