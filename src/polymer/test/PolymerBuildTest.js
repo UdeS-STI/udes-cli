@@ -59,9 +59,9 @@ describe('PolymerBuild', () => {
 
     it('should create build for production', () => {
       const options = {
+        baseURI: 'src/',
         build: false,
         buildNames: ['bundled'],
-        baseURI: 'src/',
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
@@ -76,10 +76,11 @@ describe('PolymerBuild', () => {
 
     it('should create build for dev', () => {
       const options = {
+        addBuildDir: true,
+        baseURI: 'src/',
         build: false,
         buildNames: ['bundled'],
-        rewriteBuildDev: true,
-        baseURI: 'src/',
+        copyHtaccessSample: true,
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
