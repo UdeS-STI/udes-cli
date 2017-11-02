@@ -4,10 +4,10 @@
   "description": "CLI tools used at UdeS",
   "dependencies": {
     "cpx": "^1.5.0",
-    "replace-in-file": "^2.5.3",
+    "replace-in-file": "^3.0.0",
     "shelljs": "0.7.8",
     "uglify-es": "^3.1.5",
-    "yargs": "9.0.1"
+    "yargs": "10.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
