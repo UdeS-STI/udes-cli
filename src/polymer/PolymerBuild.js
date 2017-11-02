@@ -29,10 +29,6 @@ const formatArguments = (args) => {
     copyHtaccessSample = false,
   } = args
 
-  if (!/^(\/|\w+:\/{2}).+\/$/.test(baseURI)) {
-    throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
-  }
-
   if (copyHtaccessSample) {
     logger.debug('.htaccess Rewrite without build directory: true')
   }
@@ -59,14 +55,20 @@ export default class PolymerBuild {
     } else if (!args.baseURI) {
       throw Error('Please provide baseURI argument to work with this build')
     }
+
     this.args = formatArguments(args || this.argv)
+
+    if (!/^(\/|\w+:\/{2}).+\/$/.test(this.args.baseURI)) {
+      throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
+    }
   }
 
   /**
    * Validate CLI arguments.
    */
   validateArgv = () => {
-    this.argv = yargs.usage('Usage: $0 -r baseURI [--buildNames name1 name2 ...] [-a addBuildDir]')
+    this.argv = yargs
+      .usage('Usage: udes polymer-build -u /baseURI/ [-n bundled es6-unbundled ...] [-abc]')
       .option('addBuildDir', {
         alias: 'a',
         describe: 'Append buildDir to base href and Rewritebase if true',
@@ -83,14 +85,14 @@ export default class PolymerBuild {
         default: false,
       })
       .option('buildNames', {
-        alias: 'b',
-        describe: 'Choose a build',
+        alias: 'n',
+        describe: 'List of build packages',
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
         type: 'array',
       })
       .option('baseURI', {
         alias: 'u',
-        describe: 'Choose a build',
+        describe: 'HTML base URI for href values',
       })
       .array('buildNames')
       .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
