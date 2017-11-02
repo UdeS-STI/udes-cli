@@ -23,7 +23,7 @@ const formatArguments = (args) => {
   const dir = 'build/'
   const {
     build = true,
-    buildName = getDefaultBuildNames(),
+    buildNames = getDefaultBuildNames(),
     rewriteBuildDev = false,
     rootURI,
   } = args
@@ -34,7 +34,7 @@ const formatArguments = (args) => {
 
   return {
     build,
-    buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
+    buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
     devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir,
     rewriteBuildDev,
@@ -60,12 +60,12 @@ export default class PolymerBuild {
    * Validate CLI arguments.
    */
   validateArgv = () => {
-    this.argv = yargs.usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
+    this.argv = yargs.usage('Usage: $0 -r rootURI [--buildNames name1 name2 ...] [-a addBuildDir]')
       .option('rewriteBuildDev', {
         alias: 'r',
         describe: 'Rewrite of htaccess for build dir if true',
       })
-      .option('buildName', {
+      .option('buildNames', {
         alias: 'b',
         describe: 'Choose a build',
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
@@ -75,7 +75,7 @@ export default class PolymerBuild {
         alias: 'u',
         describe: 'Choose a build',
       })
-      .array('buildName')
+      .array('buildNames')
       .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
       .help('h')
       .alias('h', 'help')

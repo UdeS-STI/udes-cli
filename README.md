@@ -36,7 +36,7 @@ from the library
 ```json
 {
   "scripts": {
-    "build": "udes polymer-build -u=dir --buildName=bundled --rewriteBuildDev"
+    "build": "udes polymer-build -u=dir --buildNames=bundled --rewriteBuildDev"
   }
 }
 ```

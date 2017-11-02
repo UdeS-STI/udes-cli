@@ -60,7 +60,7 @@ describe('PolymerBuild', () => {
     it('should create build for production', () => {
       const options = {
         build: false,
-        buildName: ['bundled'],
+        buildNames: ['bundled'],
         rootURI: '/src',
       }
       const polymerBuild = new PolymerBuild(options)
@@ -77,7 +77,7 @@ describe('PolymerBuild', () => {
     it('should create build for dev', () => {
       const options = {
         build: false,
-        buildName: ['bundled'],
+        buildNames: ['bundled'],
         rewriteBuildDev: true,
         rootURI: '/src',
       }
