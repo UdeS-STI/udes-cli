@@ -85,24 +85,24 @@ export default class PolymerBuild {
       })
       .option('build', {
         alias: 'b',
-        describe: 'Execute `polymer build` command before executing script if true',
         default: true,
+        describe: 'Execute `polymer build` command before executing script if true',
       })
       .option('buildNames', {
         alias: 'n',
-        describe: 'List of build packages',
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
+        describe: 'List of build packages',
         type: 'array',
       })
       .option('copyHtaccessSample', {
         alias: 'c',
-        describe: 'Copy of htaccess for build dir if true',
         default: false,
+        describe: 'Copy of htaccess for build dir if true',
       })
+      .alias('h', 'help')
       .array('buildNames')
       .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
       .help('h')
-      .alias('h', 'help')
       .argv
   }
 
