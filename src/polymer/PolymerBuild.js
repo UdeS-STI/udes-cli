@@ -116,7 +116,7 @@ export default class PolymerBuild {
     const { baseURI, rewriteBuildDev } = this.args
     return html.replace(
       /base\shref="[\w/~-]*"/,
-      `base href="/${baseURI}${rewriteBuildDev ? this.buildDir : ''}"`
+      `base href="${baseURI}${rewriteBuildDev ? this.buildDir : ''}"`
     )
   }
 
