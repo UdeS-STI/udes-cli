@@ -1,10 +1,8 @@
 {
   "name": "udes-cli",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
-    "cpx": "^1.5.0",
-    "replace-in-file": "^3.0.0",
     "shelljs": "0.7.8",
     "uglify-es": "^3.1.5",
     "yargs": "10.0.3"
@@ -16,7 +14,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
-    "eslint-config-udes": "^0.1.5",
+    "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
     "nsp": "2.8.1",
     "nyc": "^11.2.1",
