@@ -36,7 +36,7 @@ from the library
 ```json
 {
   "scripts": {
-    "build": "udes polymer-build -u=dir --buildName=bundled --rewriteBuildDev"
+    "build": "udes polymer-build -u /dir/ --buildNames bundled -ac"
   }
 }
 ```
@@ -44,7 +44,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run udes polymer-build -- --rootURI /path/to/project
+npm run udes polymer-build --baseURI /path/to/project/
 ``` 
 
 # Documentation

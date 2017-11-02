@@ -1,6 +1,4 @@
-import cpx from 'cpx'
 import fs from 'fs'
-import replace from 'replace-in-file'
 import shell from 'shelljs'
 import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
@@ -24,178 +22,170 @@ const getDefaultBuildNames = () =>
 const formatArguments = (args) => {
   const dir = 'build/'
   const {
+    addBuildDir = false,
+    baseURI,
     build = true,
-    buildName = getDefaultBuildNames(),
-    rewriteBuildDev = false,
-    rootURI,
+    buildNames = getDefaultBuildNames(),
+    copyHtaccessSample = false,
   } = args
 
-  if (rewriteBuildDev) {
+  if (copyHtaccessSample) {
     logger.debug('.htaccess Rewrite without build directory: true')
   }
 
   return {
+    addBuildDir,
+    baseURI,
     build,
-    buildNames: (Array.isArray(buildName)) ? buildName : [buildName],
-    devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
+    buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
+    copyHtaccessSample,
     dir,
-    rewriteBuildDev,
   }
 }
 
 /**
  * Class to handle actions related to building a polymer project.
  * @class
+ * @params {Object} [args] - Build arguments when not using command line.
+ * @params {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
+ * @params {String} args.baseURI - HTML base URI for href values.
+ * @params {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
+ * @params {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
+ * @params {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
  */
 export default class PolymerBuild {
   constructor (args) {
     if (!args) {
       this.validateArgv()
-    } else if (!args.rootURI) {
-      throw new Error('Please provide rootURI argument to work with this build')
+    } else if (!args.baseURI) {
+      throw Error('Please provide baseURI argument to work with this build')
     }
+
     this.args = formatArguments(args || this.argv)
+
+    if (!/^(\/|\w+:\/{2}).+\/$/.test(this.args.baseURI)) {
+      throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
+    }
   }
 
   /**
    * Validate CLI arguments.
    */
   validateArgv = () => {
-    this.argv = yargs.usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
-      .option('rewriteBuildDev', {
-        alias: 'r',
-        describe: 'Rewrite of htaccess for build dir if true',
+    this.argv = yargs
+      .usage('Usage: udes polymer-build -u /baseURI/ [-n bundled es6-unbundled ...] [-abc]')
+      .option('addBuildDir', {
+        alias: 'a',
+        describe: 'Append buildDir to base href and Rewritebase if true',
+        default: false,
       })
-      .option('buildName', {
+      .option('baseURI', {
+        alias: 'u',
+        describe: 'HTML base URI for href values',
+      })
+      .option('build', {
         alias: 'b',
-        describe: 'Choose a build',
+        describe: 'Execute `polymer build` command before executing script if true',
+        default: true,
+      })
+      .option('buildNames', {
+        alias: 'n',
+        describe: 'List of build packages',
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
         type: 'array',
       })
-      .option('rootURI', {
-        alias: 'u',
-        describe: 'Choose a build',
+      .option('copyHtaccessSample', {
+        alias: 'c',
+        describe: 'Copy of htaccess for build dir if true',
+        default: false,
       })
-      .array('buildName')
-      .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
+      .array('buildNames')
+      .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
       .help('h')
       .alias('h', 'help')
       .argv
   }
 
   /**
-   * Copy sample htaccess file to the build directory.
-   * @throws {Error} If copy fails.
+   * Copy sample htaccess file to the build
+   * directory and replace RewriteBase entry.
    */
-  copyHtaccess = () => {
-    const sourceHtaccess = 'htaccess.sample'
-    const htaccessSample = `${this.buildDir}/${sourceHtaccess}`
-    const htaccess = `${this.buildDir}/.htaccess`
+  formatHtaccess = () => {
+    logger.log(`Copy of .htaccess.sample to ${this.buildDir}/.htaccess ...`)
+    const sampleDir = 'htaccess.sample'
+    const { addBuildDir, baseURI } = this.args
 
-    if (!fs.existsSync(sourceHtaccess)) {
-      throw new Error(`Error, file ${sourceHtaccess} not found.`)
+    if (!fs.existsSync(sampleDir)) {
+      throw Error('Sample htaccess file not found')
     }
 
-    logger.log(`Copy of .htaccess.sample to ${this.buildDir}...`)
-    cpx.copySync(sourceHtaccess, this.buildDir)
+    let sample = fs.readFileSync('htaccess.sample').toString()
 
-    logger.log(`Rename ${htaccessSample} to ${htaccess}...`)
-    fs.renameSync(htaccessSample, htaccess)
+    sample = sample.replace(
+      /RewriteBase[\s]+.*/,
+      `RewriteBase ${baseURI}${addBuildDir ? this.buildDir : ''}`
+    )
 
-    if (!fs.existsSync(htaccess)) {
-      throw new Error(`Error, file ${htaccess} not found`)
-    }
+    fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
 
-    logger.log('Rename completed!')
+    logger.log('Copy completed!')
   }
 
   /**
-   * Update RewriteBase info in htaccess file.
-   * @throws {Error} If fails to update htaccess file.
+   * Replace base tag's href property.
+   * @param {String} html - HTML string.
+   * @returns {string} HTML with replaced base tag.
    */
-  replaceRewriteHtaccess = () => {
-    const { devdir, rewriteBuildDev } = this.args
-    const htaccess = `${this.buildDir}/.htaccess`
+  modifyMetaBase = (html) => {
+    const { addBuildDir, baseURI } = this.args
+    return html.replace(
+      /base\shref="[\w/~-]*"/,
+      `base href="${baseURI}${addBuildDir ? this.buildDir : ''}"`
+    )
+  }
 
-    logger.log(`Replacing the RewriteBase for ${htaccess} ...`)
-    const changedFiles = replace.sync({
-      files: htaccess,
-      from: /RewriteBase[\s]+.*/,
-      to: `RewriteBase /${devdir}${rewriteBuildDev ? this.buildDir : ''}`,
-    })
+  /**
+   * Replace script tags with inline JavaScript.
+   * @param {String} html - HTML string.
+   * @returns {string} HTML with replaced base tag.
+   */
+  inlineJs = (html) => {
+    const SOURCE_MATCH = 2
+    const getInlineTag = string => /<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
+    let string = html
+    let match = getInlineTag(string)
 
-    if (!changedFiles.length) {
-      throw new Error('.htaccess not modified')
+    while (match) {
+      const source = match[SOURCE_MATCH]
+      const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
+
+      string = string.replace(
+        new RegExp(`<script inline(="")? src="${source}"></script>`),
+        `<script>${UglifyJS.minify(code).code}</script>`
+      )
+
+      fs.unlinkSync(`${this.buildDir}/${source}`)
+      match = getInlineTag(string)
     }
 
-    logger.log('.htaccess modified!')
+    return string
   }
 
   /**
-   * update meta tags in index files.
+   * Refactor index.html files.
    */
-  modifyMetaBaseIndex = () => {
-    const { devdir, rewriteBuildDev } = this.args
-    const index = `${this.buildDir}/_index.html`
+  formatIndexHtml = () => {
+    const index = `${this.buildDir}/index.html`
 
-    logger.log(`Replace <meta base> of ${index}...`)
-    const changedFiles = replace.sync({
-      files: index,
-      from: /base\shref="[\w/~-]*"/, // For local execution only.
-      to: `base href="/${devdir}${rewriteBuildDev ? this.buildDir : ''}"`,
-    })
-
-    logger.log(`_index.html modified: ${!!changedFiles.length}`)
-  }
-
-  /**
-   * Update src tags in index files.
-   */
-  modifyInlineIndex = () => {
-    const index = `${this.buildDir}/_index.html`
-
-    logger.log(`Replace <src inline=""> with <src inline> in ${index}...`)
-    replace.sync({
-      files: index,
-      from: /inline=""/g,
-      to: 'inline',
-    })
-
-    logger.log(`Replace <src inline> Ok!`)
-  }
-
-  /**
-   * Minify and compress src tags in index files.
-   */
-  compressInlineIndex = () => {
-    const getInlineTag = html => /<script inline src="([\w/~-]+.js)"><\/script>/.exec(html)
-    const index = `${this.buildDir}/_index.html`
-
-    logger.log(`Minify and compress <src inline> in ${index}...`)
-
-    try {
-      let html = fs.readFileSync(index).toString()
-      let match = getInlineTag(html)
-
-      while (match) {
-        const source = match[1]
-        const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
-        const minifiedCode = UglifyJS.minify(code).code
-
-        html = html.replace(
-          `<script inline src="${source}"></script>`,
-          `<script>${minifiedCode}</script>`
-        )
-
-        fs.unlinkSync(`${this.buildDir}/${source}`)
-        match = getInlineTag(html)
-      }
-
-      fs.writeFileSync(index, html)
-      logger.log('Minify and compress <src inline> Ok!')
-    } catch (err) {
-      logger.error(err)
+    if (!fs.existsSync(index)) {
+      throw Error(`${index} file not found`)
     }
+
+    let html = fs.readFileSync(index).toString()
+    html = this.modifyMetaBase(html)
+    html = this.inlineJs(html)
+
+    fs.writeFileSync(index, html)
   }
 
   /**
@@ -208,11 +198,19 @@ export default class PolymerBuild {
   }
 
   /**
-   * Rename _index.html file in build directory.
+   * Update build files depending on environment settings.
+   * @param {String} buildName - Build name from arguments or polymer config.
    */
-  renameIndexHtml = () => {
-    if (fs.existsSync(`${this.buildDir}/_index.html`)) {
-      fs.renameSync(`${this.buildDir}/_index.html`, `${this.buildDir}/index.html`)
+  updateBuildFiles = (buildName) => {
+    this.buildDir = `${this.args.dir}${buildName}`
+    logger.log(`Build directory: ${this.buildDir}`)
+
+    this.formatIndexHtml()
+
+    if (this.args.copyHtaccessSample) {
+      this.formatHtaccess()
+    } else {
+      this.removeIndexPhp()
     }
   }
 
@@ -225,27 +223,9 @@ export default class PolymerBuild {
     }
 
     try {
-      this.args.buildNames.forEach((buildName) => {
-        this.buildDir = `${this.args.dir}${buildName}`
-        logger.log(`Build directory: ${this.buildDir}`)
-
-        this.modifyMetaBaseIndex()
-        this.modifyInlineIndex()
-        this.compressInlineIndex()
-
-        if (this.args.rewriteBuildDev) {
-          // Dev environment
-          this.copyHtaccess()
-          this.replaceRewriteHtaccess()
-        } else {
-          // Production environment
-          this.removeIndexPhp()
-          this.renameIndexHtml()
-        }
-      })
+      this.args.buildNames.forEach(this.updateBuildFiles)
     } catch (error) {
-      logger.error(error)
-      process.exit(1)
+      logger.error(error.toString())
     }
   }
 }
