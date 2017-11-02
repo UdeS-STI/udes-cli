@@ -25,7 +25,7 @@ const formatArguments = (args) => {
     build = true,
     buildNames = getDefaultBuildNames(),
     rewriteBuildDev = false,
-    rootURI,
+    baseURI,
   } = args
 
   if (rewriteBuildDev) {
@@ -35,7 +35,7 @@ const formatArguments = (args) => {
   return {
     build,
     buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
-    devdir: rootURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
+    devdir: baseURI.replace(/^\//, '').replace(/([^/])$/, '$&/'),
     dir,
     rewriteBuildDev,
   }
@@ -50,8 +50,8 @@ export default class PolymerBuild {
   constructor (args) {
     if (!args) {
       this.validateArgv()
-    } else if (!args.rootURI) {
-      throw new Error('Please provide rootURI argument to work with this build')
+    } else if (!args.baseURI) {
+      throw Error('Please provide baseURI argument to work with this build')
     }
     this.args = formatArguments(args || this.argv)
   }
@@ -60,7 +60,7 @@ export default class PolymerBuild {
    * Validate CLI arguments.
    */
   validateArgv = () => {
-    this.argv = yargs.usage('Usage: $0 -r rootURI [--buildNames name1 name2 ...] [-a addBuildDir]')
+    this.argv = yargs.usage('Usage: $0 -r baseURI [--buildNames name1 name2 ...] [-a addBuildDir]')
       .option('rewriteBuildDev', {
         alias: 'r',
         describe: 'Rewrite of htaccess for build dir if true',
@@ -71,12 +71,12 @@ export default class PolymerBuild {
         choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
         type: 'array',
       })
-      .option('rootURI', {
+      .option('baseURI', {
         alias: 'u',
         describe: 'Choose a build',
       })
       .array('buildNames')
-      .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
+      .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
       .help('h')
       .alias('h', 'help')
       .argv

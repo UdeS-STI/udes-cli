@@ -44,7 +44,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run udes polymer-build -- --rootURI /path/to/project
+npm run udes polymer-build -- --baseURI /path/to/project
 ``` 
 
 # Documentation
