@@ -47,6 +47,11 @@ const formatArguments = (args) => {
  * Class to handle actions related to building a polymer project.
  * @class
  * @params {Object} [args] - Build arguments when not using command line.
+ * @params {Boolean} [args.addBuildDir = false] - Append buildDir to base href and Rewritebase if true.
+ * @params {String} args.baseURI - HTML base URI for href values.
+ * @params {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
+ * @params {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
+ * @params {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
  */
 export default class PolymerBuild {
   constructor (args) {
