@@ -23,10 +23,15 @@ const formatArguments = (args) => {
   const dir = 'build/'
   const {
     addBuildDir = false,
+    baseURI,
     build = true,
     buildNames = getDefaultBuildNames(),
     copyHtaccessSample = false,
   } = args
+
+  if (!/^(\/|\w+:\/{2}).+\/$/.test(baseURI)) {
+    throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
+  }
 
   if (copyHtaccessSample) {
     logger.debug('.htaccess Rewrite without build directory: true')
@@ -34,7 +39,7 @@ const formatArguments = (args) => {
 
   return {
     addBuildDir,
-    baseURI: args.baseURI,
+    baseURI,
     build,
     buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
     dir,
@@ -65,10 +70,17 @@ export default class PolymerBuild {
       .option('addBuildDir', {
         alias: 'a',
         describe: 'Append buildDir to base href and Rewritebase if true',
+        default: false,
+      })
+      .option('build', {
+        alias: 'b',
+        describe: 'Execute `polymer build` command before executing script if true',
+        default: true,
       })
       .option('copyHtaccessSample', {
         alias: 'c',
         describe: 'Copy of htaccess for build dir if true',
+        default: false,
       })
       .option('buildNames', {
         alias: 'b',
@@ -104,7 +116,7 @@ export default class PolymerBuild {
 
     sample = sample.replace(
       /RewriteBase[\s]+.*/,
-      `RewriteBase /${baseURI}${addBuildDir ? this.buildDir : ''}`
+      `RewriteBase ${baseURI}${addBuildDir ? this.buildDir : ''}`
     )
 
     fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
