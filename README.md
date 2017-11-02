@@ -2,7 +2,6 @@ UdeS CLI
 ========
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/UdeS-STI/udes-cli.svg)](https://greenkeeper.io/)
-
 [![CircleCI](https://circleci.com/gh/UdeS-STI/udes-cli.svg?style=svg)](https://circleci.com/gh/UdeS-STI/udes-cli)
 [![npm](https://img.shields.io/npm/v/udes-cli.svg?style=flat-square)](https://www.npmjs.com/package/udes-cli)
 ![Node](https://img.shields.io/badge/node-6.10.1-brightgreen.svg)
