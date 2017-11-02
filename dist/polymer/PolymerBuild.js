@@ -95,7 +95,7 @@ var PolymerBuild = function PolymerBuild(args) {
     }).array('buildName').demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build').help('h').alias('h', 'help').argv;
   };
 
-  this.handleHtaccess = function () {
+  this.formatHtaccess = function () {
     _logger.logger.log('Copy of .htaccess.sample to ' + _this.buildDir + '/.htaccess ...');
     var _args = _this.args,
         devdir = _args.devdir,
@@ -139,7 +139,7 @@ var PolymerBuild = function PolymerBuild(args) {
     return string;
   };
 
-  this.handleIndexFile = function () {
+  this.formatIndexHtml = function () {
     var index = _this.buildDir + '/index.html';
 
     var html = _fs2.default.readFileSync(index).toString();
@@ -161,15 +161,15 @@ var PolymerBuild = function PolymerBuild(args) {
     }
   };
 
-  this.handleBuild = function (buildName) {
+  this.updateBuildFiles = function (buildName) {
     _this.buildDir = '' + _this.args.dir + buildName;
     _logger.logger.log('Build directory: ' + _this.buildDir);
 
-    _this.handleIndexFile();
+    _this.formatIndexHtml();
 
     if (_this.args.rewriteBuildDev) {
       // Dev environment
-      _this.handleHtaccess();
+      _this.formatHtaccess();
     } else {
       // Production environment
       _this.removeIndexPhp();
@@ -183,7 +183,7 @@ var PolymerBuild = function PolymerBuild(args) {
     }
 
     try {
-      _this.args.buildNames.forEach(_this.handleBuild);
+      _this.args.buildNames.forEach(_this.updateBuildFiles);
     } catch (error) {
       _logger.logger.error(error);
       process.exit(1);

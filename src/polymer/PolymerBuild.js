@@ -91,14 +91,13 @@ export default class PolymerBuild {
    * Copy sample htaccess file to the build
    * directory and replace RewriteBase entry.
    */
-  handleHtaccess = () => {
+  formatHtaccess = () => {
     logger.log(`Copy of .htaccess.sample to ${this.buildDir}/.htaccess ...`)
     const sampleDir = 'htaccess.sample'
     const { addBuildDir, baseURI } = this.args
 
     if (!fs.existsSync(sampleDir)) {
-      const error = 'Sample htaccess file not found'
-      throw error
+      throw Error('Sample htaccess file not found')
     }
 
     let sample = fs.readFileSync('htaccess.sample').toString()
@@ -155,12 +154,11 @@ export default class PolymerBuild {
   /**
    * Refactor index.html files.
    */
-  handleIndexFile = () => {
+  formatIndexHtml = () => {
     const index = `${this.buildDir}/index.html`
 
     if (!fs.existsSync(index)) {
-      const error = `${index} file not found`
-      throw error
+      throw Error(`${index} file not found`)
     }
 
     let html = fs.readFileSync(index).toString()
@@ -183,14 +181,14 @@ export default class PolymerBuild {
    * Update build files depending on environment settings.
    * @param {String} buildName - Build name from arguments or polymer config.
    */
-  handleBuild = (buildName) => {
+  updateBuildFiles = (buildName) => {
     this.buildDir = `${this.args.dir}${buildName}`
     logger.log(`Build directory: ${this.buildDir}`)
 
-    this.handleIndexFile()
+    this.formatIndexHtml()
 
     if (this.args.copyHtaccessSample) {
-      this.handleHtaccess()
+      this.formatHtaccess()
     } else {
       this.removeIndexPhp()
     }
@@ -205,9 +203,9 @@ export default class PolymerBuild {
     }
 
     try {
-      this.args.buildNames.forEach(this.handleBuild)
+      this.args.buildNames.forEach(this.updateBuildFiles)
     } catch (error) {
-      logger.error(error)
+      logger.error(error.toString())
     }
   }
 }
