@@ -141,12 +141,10 @@ export default class PolymerBuild {
    * @param {String} html - HTML string.
    * @returns {string} HTML with replaced base tag.
    */
-  modifyMetaBase = (html) => {
-    return html.replace(
-      /base\shref="[\w/~-]*"/,
-      `base href="${this.baseURL}"`
-    )
-  }
+  modifyMetaBase = html => html.replace(
+    /base\shref="[\w/~-]*"/,
+    `base href="${this.baseURL}"`
+  )
 
   /**
    * Replace script tags with inline JavaScript.
@@ -214,17 +212,7 @@ export default class PolymerBuild {
       dir,
     } = this.args
 
-    let baseURL = baseURI
-
-    if (addBuildDir) {
-      baseURL += dir
-    }
-
-    if (addBuildName) {
-      baseURL += `${buildName}/`
-    }
-
-    return baseURL
+    return `${baseURI}${addBuildDir ? dir : ''}${addBuildName ? `${buildName}/` : ''}`
   }
 
   /**
