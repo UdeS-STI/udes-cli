@@ -14,6 +14,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
+    "cross-env": "^5.1.1",
     "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
     "nsp": "2.8.1",
@@ -24,11 +25,11 @@
   "scripts": {
     "audit": "node_modules/.bin/nsp check",
     "build": "babel ./src --out-dir dist --ignore '**/*Test.js'",
-    "coverage": "NODE_ENV=test node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
+    "coverage": "cross-env NODE_ENV=test node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
     "format": "eslint . --ignore-path .gitignore --fix",
     "lint": "eslint . --ignore-path .gitignore",
     "prepublish": "npm run build",
-    "test": "NODE_ENV=test mocha --require babel-core/register --opts ../mocha.opts ./src/**/**Test.js",
+    "test": "cross-env NODE_ENV=test mocha --require babel-core/register --opts ../mocha.opts ./src/**/**Test.js",
     "udes-polymer-build": "udes polymer-build"
   },
   "bin": {
