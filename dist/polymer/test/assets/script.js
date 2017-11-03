@@ -1,4 +1,5 @@
 'use strict';
 
+/* eslint no-unused-vars: 0 */
 var hello = 'world';
-hello.replace('world', 'foo');
+hello = hello.replace('world', 'foo');

@@ -49,6 +49,8 @@ var formatArguments = function formatArguments(args) {
   var dir = 'build/';
   var _args$addBuildDir = args.addBuildDir,
       addBuildDir = _args$addBuildDir === undefined ? false : _args$addBuildDir,
+      _args$addBuildName = args.addBuildName,
+      addBuildName = _args$addBuildName === undefined ? false : _args$addBuildName,
       baseURI = args.baseURI,
       _args$build = args.build,
       build = _args$build === undefined ? true : _args$build,
@@ -64,6 +66,7 @@ var formatArguments = function formatArguments(args) {
 
   return {
     addBuildDir: addBuildDir,
+    addBuildName: addBuildName,
     baseURI: baseURI,
     build: build,
     buildNames: Array.isArray(buildNames) ? buildNames : [buildNames],
@@ -93,40 +96,39 @@ var PolymerBuild = function PolymerBuild(args) {
       alias: 'a',
       describe: 'Append buildDir to base href and Rewritebase if true',
       default: false
+    }).option('addBuildName', {
+      describe: 'Append build name to base href and Rewritebase if true',
+      default: false
     }).option('baseURI', {
       alias: 'u',
       describe: 'HTML base URI for href values'
     }).option('build', {
       alias: 'b',
-      describe: 'Execute `polymer build` command before executing script if true',
-      default: true
+      default: true,
+      describe: 'Execute `polymer build` command before executing script if true'
     }).option('buildNames', {
       alias: 'n',
-      describe: 'List of build packages',
       choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
+      describe: 'List of build packages',
       type: 'array'
     }).option('copyHtaccessSample', {
       alias: 'c',
-      describe: 'Copy of htaccess for build dir if true',
-      default: false
-    }).array('buildNames').demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build').help('h').alias('h', 'help').argv;
+      default: false,
+      describe: 'Copy of htaccess for build dir if true'
+    }).alias('h', 'help').array('buildNames').demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build').help('h').argv;
   };
 
   this.formatHtaccess = function () {
-    _logger.logger.log('Copy of .htaccess.sample to ' + _this.buildDir + '/.htaccess ...');
-    var sampleDir = 'htaccess.sample';
-    var _args = _this.args,
-        addBuildDir = _args.addBuildDir,
-        baseURI = _args.baseURI;
+    var sampleFile = 'htaccess.sample';
+    _logger.logger.log('Copy of ' + sampleFile + ' to ' + _this.buildDir + '.htaccess ...');
 
-
-    if (!_fs2.default.existsSync(sampleDir)) {
-      throw Error('Sample htaccess file not found');
+    if (!_fs2.default.existsSync(sampleFile)) {
+      throw Error(sampleFile + ' file not found');
     }
 
-    var sample = _fs2.default.readFileSync('htaccess.sample').toString();
+    var sample = _fs2.default.readFileSync(sampleFile).toString();
 
-    sample = sample.replace(/RewriteBase[\s]+.*/, 'RewriteBase ' + baseURI + (addBuildDir ? _this.buildDir : ''));
+    sample = sample.replace(/RewriteBase[\s]+.*/, 'RewriteBase ' + _this.baseURL);
 
     _fs2.default.writeFileSync(_this.buildDir + '/.htaccess', sample);
 
@@ -134,11 +136,7 @@ var PolymerBuild = function PolymerBuild(args) {
   };
 
   this.modifyMetaBase = function (html) {
-    var _args2 = _this.args,
-        addBuildDir = _args2.addBuildDir,
-        baseURI = _args2.baseURI;
-
-    return html.replace(/base\shref="[\w/~-]*"/, 'base href="' + baseURI + (addBuildDir ? _this.buildDir : '') + '"');
+    return html.replace(/base\shref="[\w/~-]*"/, 'base href="' + _this.baseURL + '"');
   };
 
   this.inlineJs = function (html) {
@@ -183,8 +181,30 @@ var PolymerBuild = function PolymerBuild(args) {
     }
   };
 
+  this.getBaseURL = function (buildName) {
+    var _args = _this.args,
+        addBuildDir = _args.addBuildDir,
+        addBuildName = _args.addBuildName,
+        baseURI = _args.baseURI,
+        dir = _args.dir;
+
+
+    var baseURL = baseURI;
+
+    if (addBuildDir) {
+      baseURL += dir;
+    }
+
+    if (addBuildName) {
+      baseURL += buildName + '/';
+    }
+
+    return baseURL;
+  };
+
   this.updateBuildFiles = function (buildName) {
-    _this.buildDir = '' + _this.args.dir + buildName;
+    _this.buildDir = '' + _this.args.dir + buildName + '/';
+    _this.baseURL = _this.getBaseURL(buildName);
     _logger.logger.log('Build directory: ' + _this.buildDir);
 
     _this.formatIndexHtml();
@@ -253,6 +273,13 @@ var PolymerBuild = function PolymerBuild(args) {
 
 /**
  * Delete index.php file from build directory.
+ */
+
+
+/**
+ * Return the base URL.
+ * @param {String} buildName - Build name from arguments or polymer config.
+ * @return {String} Base URL.
  */
 
 
