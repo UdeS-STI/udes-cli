@@ -50,7 +50,7 @@ const formatArguments = (args) => {
  */
 export default class PolymerBuild {
   /**
-   * @param {Object} [args={}] - Build arguments when not using command line.
+   * @param {Object} args - Build arguments when not using command line.
    * @param {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
    * @param {Boolean} [args.addBuildName=false] - Append build name to base href and Rewritebase if true.
    * @param {String} args.baseURI - HTML base URI for href values.
@@ -58,7 +58,7 @@ export default class PolymerBuild {
    * @param {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
    * @param {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
    */
-  constructor (args = {}) {
+  constructor (args) {
     if (!args) {
       this.validateArgv()
     } else if (!args.baseURI) {
@@ -68,7 +68,7 @@ export default class PolymerBuild {
     this.args = formatArguments(args || this.argv)
 
     if (!PolymerBuild.isValidBaseURI(this.args.baseURI)) {
-      throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
+      throw Error(`Invalid argument baseURI (${this.args.baseURI}). Please use '/path/to/use/' or 'http://exemple.com/' format`)
     }
   }
 

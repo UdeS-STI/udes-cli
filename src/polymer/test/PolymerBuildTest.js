@@ -93,7 +93,7 @@ describe('PolymerBuild', () => {
 
         try {
           // eslint-disable-next-line no-unused-vars
-          const polymerBuild = new PolymerBuild()
+          const polymerBuild = new PolymerBuild({})
         } catch (err) {
           error = err
         }
