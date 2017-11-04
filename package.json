@@ -4,6 +4,7 @@
   "description": "CLI tools used at UdeS",
   "dependencies": {
     "shelljs": "0.7.8",
+    "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.5",
     "yargs": "10.0.3"
   },
