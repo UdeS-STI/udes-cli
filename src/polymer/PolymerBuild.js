@@ -47,17 +47,15 @@ const formatArguments = (args) => {
 /**
  * Class to handle actions related to building a polymer project.
  * @class
+ * @param {Object} args - Build arguments when not using command line.
+ * @param {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
+ * @param {Boolean} [args.addBuildName=false] - Append build name to base href and Rewritebase if true.
+ * @param {String} args.baseURI - HTML base URI for href values.
+ * @param {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
+ * @param {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
+ * @param {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
  */
 export default class PolymerBuild {
-  /**
-   * @param {Object} args - Build arguments when not using command line.
-   * @param {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
-   * @param {Boolean} [args.addBuildName=false] - Append build name to base href and Rewritebase if true.
-   * @param {String} args.baseURI - HTML base URI for href values.
-   * @param {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
-   * @param {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
-   * @param {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
-   */
   constructor (args) {
     if (!args) {
       this.validateArgv()
@@ -67,18 +65,18 @@ export default class PolymerBuild {
 
     this.args = formatArguments(args || this.argv)
 
-    if (!PolymerBuild.isValidBaseURI(this.args.baseURI)) {
+    if (!this.__isValidBaseURI(this.args.baseURI)) {
       throw Error(`Invalid argument baseURI (${this.args.baseURI}). Please use '/path/to/use/' or 'http://exemple.com/' format`)
     }
   }
 
   /**
    * Return true if the baseURI is valid.
-   * @static
+   * @private
    * @param {String} baseURI - Base URI.
    * @return {Boolean} True if the baseURI is valid.
    */
-  static isValidBaseURI (baseURI) {
+  __isValidBaseURI (baseURI) {
     return (/^((\/|\w+:\/{2}).+)?\/$/.test(baseURI))
   }
 
