@@ -26,7 +26,11 @@ const formatArguments = (args) => {
 /**
  * Class to handle actions related to building a polymer project.
  * @class
- * @params {Object} [args] - Build arguments when not using command line.
+ * @param {Object} [args] - Linting arguments when not using command line.
+ * @param {String} [dir] - Base directory to execute commands.
+ * @param {Boolean} [html] - Lint HTML files if true.
+ * @param {Boolean} [js] - Lint JS/JSON files if true.
+ * @param {Boolean} [polymer] - Lint polymer project if true.
  */
 export default class Lint {
   constructor (args) {
@@ -40,6 +44,7 @@ export default class Lint {
 
   /**
    * Validate CLI arguments.
+   * @private
    */
   validateArgv = () => {
     this.argv = yargs
@@ -68,7 +73,7 @@ export default class Lint {
   }
 
   /**
-   * Execute code for building polymer project.
+   * Lint project.
    */
   run = () => {
     const { dir, html, js, polymer } = this.args
