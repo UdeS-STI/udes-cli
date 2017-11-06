@@ -21,40 +21,65 @@ const deleteFolderRecursive = (path) => {
 }
 
 describe('PolymerBuild', () => {
-  before(() => {
-    if (!fs.existsSync('build')) {
-      fs.mkdirSync('build')
-      fs.mkdirSync('build/bundled')
-    }
+  describe('constructor', () => {
+    it('should throw an error if argument `rootURI` is missing', () => {
+      const options = {buildNames: []}
+      expect(() => new PolymerBuild(options)).to.throw(Error)
+    })
 
-    // TODO: Use fs.copyFileSync() after updating to node 8.
-    fs.writeFileSync('htaccess.sample', fs.readFileSync(`${__dirname}/assets/htaccess.sample`))
-  })
+    it('should not throw an error for correct baseURIs', () => {
+      const baseURIs = [
+        '/',
+        '/~ranb2002/',
+        '/www.exemple.com/',
+        'https://www.exemple.com/',
+        'https://www.exemple.com/~ranb2002/',
+      ]
 
-  beforeEach(() => {
-    files.forEach((filename) => {
-      // TODO: Use fs.copyFileSync() after updating to node 8.
-      fs.writeFileSync(`build/bundled/${filename}`, fs.readFileSync(`${__dirname}/assets/${filename}`))
+      baseURIs.forEach(baseURI => {
+        const options = {baseURI, buildNames: []}
+        expect(() => new PolymerBuild(options)).not.to.throw(Error)
+      })
+    })
+
+    it('should throw an error for invalid baseURIs', () => {
+      const baseURIs = [
+        '/~ranb2002',
+        '/www.exemple.com',
+        'https://www.exemple.com',
+        'https://www.exemple.com/~ranb2002',
+        '~ranb2002/',
+        'www.exemple.com/',
+      ]
+
+      baseURIs.forEach(baseURI => {
+        const options = {baseURI, buildNames: []}
+        expect(() => new PolymerBuild(options)).to.throw(Error)
+      })
     })
   })
 
-  after(() => {
-    deleteFolderRecursive('build')
-    fs.unlinkSync('htaccess.sample')
-  })
-
   describe('run', () => {
-    it('should throw error if argument `rootURI` is missing', () => {
-      let error
-
-      try {
-        // eslint-disable-next-line no-unused-vars
-        const polymerBuild = new PolymerBuild({})
-      } catch (err) {
-        error = err
+    before(() => {
+      if (!fs.existsSync('build')) {
+        fs.mkdirSync('build')
+        fs.mkdirSync('build/bundled')
       }
 
-      expect(error).to.be.not.undefined
+      // TODO: Use fs.copyFileSync() after updating to node 8.
+      fs.writeFileSync('htaccess.sample', fs.readFileSync(`${__dirname}/assets/htaccess.sample`))
+    })
+
+    beforeEach(() => {
+      files.forEach((filename) => {
+        // TODO: Use fs.copyFileSync() after updating to node 8.
+        fs.writeFileSync(`build/bundled/${filename}`, fs.readFileSync(`${__dirname}/assets/${filename}`))
+      })
+    })
+
+    after(() => {
+      deleteFolderRecursive('build')
+      fs.unlinkSync('htaccess.sample')
     })
 
     it('should create build for production', () => {
