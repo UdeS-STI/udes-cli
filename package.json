@@ -3,10 +3,10 @@
   "version": "0.2.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
-    "shelljs": "0.7.8",
+    "shelljs": "^0.7.8",
     "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.5",
-    "yargs": "10.0.3"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -18,7 +18,7 @@
     "cross-env": "^5.1.1",
     "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
-    "nsp": "3.0.0",
+    "nsp": "^3.0.0",
     "nyc": "^11.2.1",
     "sinon": "^4.0.2",
     "sinon-chai": "^2.14.0"
