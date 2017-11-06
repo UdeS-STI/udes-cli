@@ -15,7 +15,10 @@ const jsformat = 'eslint . --ext js,json --ignore-path .gitignore --fix'
 const polymerformat = 'polymer lint --fix'
 
 const getFormatInstance = (args = {}) => {
-  const format = new Format(args)
+  const format = new Format({
+    ...args,
+    path: '.',
+  })
 
   format.shell.exec = sinon.spy()
   format.isPolymerProject = () => isPolymerProject
@@ -26,7 +29,7 @@ const getFormatInstance = (args = {}) => {
 describe('Format', () => {
   describe('constructor', () => {
     it('should set all argument flags to true if none are set', () => {
-      Object.values((new Format({})).args).forEach(arg =>
+      Object.values((new Format({ path: '.' })).args).forEach(arg =>
         expect(!!arg).to.be.true
       )
     })

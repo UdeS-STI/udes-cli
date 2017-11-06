@@ -19,6 +19,8 @@ export default class Lintable {
   constructor (commands, args) {
     if (!args) {
       this.validateArgv()
+    } else if (!args.path) {
+      throw Error('Missing argument `path`')
     }
 
     this.args = this.formatArguments(args || this.argv)
@@ -33,7 +35,13 @@ export default class Lintable {
   validateArgv = () => {
     const { name } = this.constructor
     this.argv = yargs
-      .usage('Usage: udes lint [-d] [--html] [--js] [-p]')
+      .command(`${name.toLowerCase()} <path>`, `${name} project`, (yargs) => {
+        yargs
+          .positional('path', {
+            describe: 'path to execute commands',
+          })
+      }, argv => {})
+      .usage('Usage: udes lint <path> [--html] [--js] [-p]')
       .describe('If no flags are specified, all available commands will be used')
       .option('html', {
         describe: `${name} HTML files if set`,
@@ -48,10 +56,6 @@ export default class Lintable {
         describe: `${name} polymer project if set`,
         default: false,
       })
-      .option('dir', {
-        alias: 'd',
-        describe: 'Base directory to execute commands',
-      })
       .alias('h', 'help')
       .help('h')
       .argv
@@ -64,18 +68,18 @@ export default class Lintable {
    * @returns {Object} Arguments in a formatted object.
    */
   formatArguments = (args) => {
-    const { dir = '.', html, js, polymer } = args
+    const { html, js, path, polymer } = args
 
     if (!html && !js && !polymer) {
       return {
-        dir,
         html: true,
         js: true,
+        path,
         polymer: true,
       }
     }
 
-    return { dir, html, js, polymer }
+    return { html, js, path, polymer }
   }
 
   /**
