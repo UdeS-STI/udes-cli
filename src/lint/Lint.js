@@ -9,33 +9,35 @@ import yargs from 'yargs'
  * @returns {Object} Arguments in a formatted object.
  */
 const formatArguments = (args) => {
-  const { dir = '.', html, js, polymer } = args
+  const { html, js, path, polymer } = args
 
   if (!html && !js && !polymer) {
     return {
-      dir,
       html: true,
       js: true,
+      path,
       polymer: true,
     }
   }
 
-  return { dir, html, js, polymer }
+  return { html, js, path, polymer }
 }
 
 /**
  * Class to handle actions related to building a polymer project.
  * @class
  * @param {Object} [args] - Linting arguments when not using command line.
- * @param {String} [dir] - Base directory to execute commands.
  * @param {Boolean} [html] - Lint HTML files if true.
  * @param {Boolean} [js] - Lint JS/JSON files if true.
+ * @param {String} path - Path to execute commands.
  * @param {Boolean} [polymer] - Lint polymer project if true.
  */
 export default class Lint {
   constructor (args) {
     if (!args) {
       this.validateArgv()
+    } else if (!args.path) {
+      throw new Error('Missing argument `path`')
     }
 
     this.args = formatArguments(args || this.argv)
@@ -48,12 +50,14 @@ export default class Lint {
    */
   validateArgv = () => {
     this.argv = yargs
-      .usage('Usage: udes lint [-d] [--html] [--js] [-p]')
+      .command('lint <path>', 'Lint project', (yargs) => {
+        yargs
+          .positional('path', {
+            describe: 'path to execute commands',
+          })
+      }, argv => {})
+      .usage('Usage: udes lint <path> [--html] [--js] [-p]')
       .describe('If no flags are specified, all available commands will be used')
-      .option('dir', {
-        alias: 'd',
-        describe: 'Base directory to execute commands',
-      })
       .option('html', {
         describe: 'Lint HTML files if set',
         default: false,
@@ -76,14 +80,14 @@ export default class Lint {
    * Lint project.
    */
   run = () => {
-    const { dir, html, js, polymer } = this.args
+    const { html, js, path, polymer } = this.args
 
     if (html) {
-      this.shell.exec(`htmlhint ${dir}/*/.html --config .htmlhintrc.json`)
+      this.shell.exec(`htmlhint ${path}/*/.html --config .htmlhintrc.json`)
     }
 
     if (js) {
-      this.shell.exec(`eslint ${dir} --ext js,json --ignore-path .gitignore`)
+      this.shell.exec(`eslint ${path} --ext js,json --ignore-path .gitignore`)
     }
 
     if (polymer && this.isPolymerProject()) {

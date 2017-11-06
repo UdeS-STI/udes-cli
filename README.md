@@ -38,7 +38,7 @@ from the library
 {
   "scripts": {
     "build": "udes polymer-build -u /dir/ --buildNames bundled -ac",
-    "lint": "udes lint"
+    "lint": "udes lint ."
   }
 }
 ```
@@ -46,7 +46,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run udes lint
+npm run udes lint .
 npm run udes polymer-build --baseURI /path/to/project/
 ``` 
 

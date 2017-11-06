@@ -15,7 +15,10 @@ const jsLint = 'eslint . --ext js,json --ignore-path .gitignore'
 const polymerLint = 'polymer lint'
 
 const getLintInstance = (args = {}) => {
-  const lint = new Lint(args)
+  const lint = new Lint({
+    ...args,
+    path: '.',
+  })
 
   lint.shell.exec = sinon.spy()
   lint.isPolymerProject = () => isPolymerProject
@@ -26,7 +29,7 @@ const getLintInstance = (args = {}) => {
 describe('Lint', () => {
   describe('constructor', () => {
     it('should set all argument flags to true if none are set', () => {
-      Object.values((new Lint({})).args).forEach(arg =>
+      Object.values((new Lint({ path: '.' })).args).forEach(arg =>
         expect(!!arg).to.be.true
       )
     })
