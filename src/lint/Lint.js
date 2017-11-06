@@ -48,7 +48,7 @@ export default class Lint {
    */
   validateArgv = () => {
     this.argv = yargs
-      .usage('Usage: udes lint [-html] [-js] [-p]')
+      .usage('Usage: udes lint [-d] [--html] [--js] [-p]')
       .describe('If no flags are specified, all available commands will be used')
       .option('html', {
         describe: 'Lint HTML files if set',
