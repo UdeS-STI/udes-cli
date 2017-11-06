@@ -37,7 +37,8 @@ from the library
 ```json
 {
   "scripts": {
-    "build": "udes polymer-build -u /dir/ --buildNames bundled -ac"
+    "build": "udes polymer-build -u /dir/ --buildNames bundled -ac",
+    "lint": "udes lint"
   }
 }
 ```
@@ -45,6 +46,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
+npm run udes lint
 npm run udes polymer-build --baseURI /path/to/project/
 ``` 
 
@@ -57,16 +59,12 @@ TODO
 .
 ├── bin
 |   └── udes (CLI entry point)
-├── dist 
-|   └── transpiled (es5) source files
 └── src
     ├── UdeSCLI (main class, handles all CLI requests)
     ├── lib (utility files)
-    └── polymer
-        └── polymer source files
+    └── CLI class directories
 ```
 * Source files must be added to the `src` directory.
-* The `dist` directory contains files built from `babel-cli`.
 
 ## Style
 You must use the following guides:
