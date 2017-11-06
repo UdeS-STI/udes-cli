@@ -18,7 +18,7 @@
     "cross-env": "^5.1.1",
     "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
-    "nsp": "2.8.1",
+    "nsp": "3.0.0",
     "nyc": "^11.2.1",
     "sinon": "^4.0.2",
     "sinon-chai": "^2.14.0"
