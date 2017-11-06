@@ -1,5 +1,6 @@
 import yargs from 'yargs'
 
+import Format from './lint/Format'
 import PolymerBuild from './polymer/PolymerBuild'
 
 /**
@@ -13,6 +14,7 @@ export default class UdeSCLI {
   help = () => {
     this.argv = yargs
       .usage('Usage: udes <command> [options]')
+      .command('format', 'Format files using linting tools')
       .command('polymer-build', 'Build a polymer repo for release')
       .help('h')
       .alias('h', 'help')
@@ -27,6 +29,10 @@ export default class UdeSCLI {
     let commandInstance
 
     switch (command) {
+      case 'format':
+        commandInstance = new Format()
+        commandInstance.run()
+        break
       case 'polymer-build':
         commandInstance = new PolymerBuild()
         commandInstance.run()

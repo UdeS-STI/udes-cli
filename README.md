@@ -37,7 +37,8 @@ from the library
 ```json
 {
   "scripts": {
-    "build": "udes polymer-build -u /dir/ --buildNames bundled -ac"
+    "build": "udes polymer-build -u /dir/ --buildNames bundled -ac",
+    "format": "udes format ."
   }
 }
 ```
@@ -45,6 +46,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
+npm run udes format .
 npm run udes polymer-build --baseURI /path/to/project/
 ``` 
 

@@ -3,33 +3,12 @@ import shell from 'shelljs'
 import yargs from 'yargs'
 
 /**
- * Converts command line arguments into a usable object.
- * @private
- * @param {[String]} args - Arguments passed through command line.
- * @returns {Object} Arguments in a formatted object.
- */
-const formatArguments = (args) => {
-  const { dir = '.', html, js, polymer } = args
-
-  if (!html && !js && !polymer) {
-    return {
-      dir,
-      html: true,
-      js: true,
-      polymer: true,
-    }
-  }
-
-  return { dir, html, js, polymer }
-}
-
-/**
  * Class to handle actions related to building a polymer project.
  * @class
  * @param {Object} commands - Commands to be executed.
- * @param {String} commands.html - Command to be executed for html flag.
- * @param {String} commands.js - Command to be executed for js flag.
- * @param {String} commands.polymer - Command to be executed for polymer flag.
+ * @param {Function|String} commands.html - Command to be executed for html flag.
+ * @param {Function|String} commands.js - Command to be executed for js flag.
+ * @param {Function|String} commands.polymer - Command to be executed for polymer flag.
  * @param {Object} [args] - Linting arguments when not using command line.
  * @param {String} [dir] - Base directory to execute commands.
  * @param {Boolean} [html] - Format HTML files if true.
@@ -42,8 +21,8 @@ export default class Lintable {
       this.validateArgv()
     }
 
+    this.args = this.formatArguments(args || this.argv)
     this.commands = commands
-    this.args = formatArguments(args || this.argv)
     this.shell = shell
   }
 
@@ -52,21 +31,21 @@ export default class Lintable {
    * @private
    */
   validateArgv = () => {
-    console.log(this.constructor.name)
+    const { name } = this.constructor
     this.argv = yargs
       .usage('Usage: udes lint [-d] [--html] [--js] [-p]')
       .describe('If no flags are specified, all available commands will be used')
       .option('html', {
-        describe: 'Format HTML files if set',
+        describe: `${name} HTML files if set`,
         default: false,
       })
       .option('js', {
-        describe: 'Format JavaScript and JSON files if set',
+        describe: `${name} JavaScript and JSON files if set`,
         default: false,
       })
       .option('polymer', {
         alias: 'p',
-        describe: 'Use polymer lint if set',
+        describe: `${name} polymer project if set`,
         default: false,
       })
       .option('dir', {
@@ -79,23 +58,57 @@ export default class Lintable {
   }
 
   /**
+   * Converts command line arguments into a usable object.
+   * @private
+   * @param {[String]} args - Arguments passed through command line.
+   * @returns {Object} Arguments in a formatted object.
+   */
+  formatArguments = (args) => {
+    const { dir = '.', html, js, polymer } = args
+
+    if (!html && !js && !polymer) {
+      return {
+        dir,
+        html: true,
+        js: true,
+        polymer: true,
+      }
+    }
+
+    return { dir, html, js, polymer }
+  }
+
+  /**
    * Format project.
    */
   run = () => {
-    const { html, js, polymer } = this.args
+    const { html, js, polymer } = this.commands
 
-    if (html) {
-      this.shell.exec(this.commands.html)
+    if (this.args.html) {
+      this.shell.exec(this.getCommand(html))
     }
 
-    if (js) {
-      this.shell.exec(this.commands.js)
+    if (this.args.js) {
+      this.shell.exec(this.getCommand(js))
     }
 
-    if (polymer && this.isPolymerProject()) {
-      this.shell.exec(this.commands.polymer)
+    if (this.args.polymer && this.isPolymerProject()) {
+      this.shell.exec(this.getCommand(polymer))
     }
   }
 
+  /**
+   * Get command string based on type a data.
+   * @private
+   * @param {Function|String} command - String or function returning a string to be executed.
+   * @returns {String} Bash command.
+   */
+  getCommand = command => typeof command === 'function' ? command() : command
+
+  /**
+   * Determines whether the project is polymer project.
+   * @private
+   * @returns {Boolean} true if polymer.json file is found.
+   */
   isPolymerProject = () => fs.existsSync('./polymer.json')
 }

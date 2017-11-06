@@ -10,9 +10,9 @@ chai.use(sinonChai)
 
 let isPolymerProject
 
-const htmlformat = 'htmlhint ./*/.html --config .htmlhintrc.json'
-const jsformat = 'esformat . --ext js,json --ignore-path .gitignore'
-const polymerformat = 'polymer format'
+const htmlformat = 'eslint . --ext html --ignore-path .gitignore --fix'
+const jsformat = 'eslint . --ext js,json --ignore-path .gitignore --fix'
+const polymerformat = 'polymer lint --fix'
 
 const getFormatInstance = (args = {}) => {
   const format = new Format(args)
