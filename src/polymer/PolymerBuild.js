@@ -2,8 +2,7 @@ import fs from 'fs'
 import shell from 'shelljs'
 import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
-
-import { logger } from '../lib/logger'
+import { udesLogger as logger } from 'udes-logger'
 
 /**
  * Get build names from polymer config file.
@@ -48,12 +47,13 @@ const formatArguments = (args) => {
 /**
  * Class to handle actions related to building a polymer project.
  * @class
- * @params {Object} [args] - Build arguments when not using command line.
- * @params {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
- * @params {String} args.baseURI - HTML base URI for href values.
- * @params {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
- * @params {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
- * @params {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
+ * @param {Object} args - Build arguments when not using command line.
+ * @param {Boolean} [args.addBuildDir=false] - Append buildDir to base href and Rewritebase if true.
+ * @param {Boolean} [args.addBuildName=false] - Append build name to base href and Rewritebase if true.
+ * @param {String} args.baseURI - HTML base URI for href values.
+ * @param {Boolean} [args.build=true] - Execute `polymer build` command before executing script if true.
+ * @param {[String]} [args.buildNames=getDefaultBuildNames()] - List of build packages.
+ * @param {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
  */
 export default class PolymerBuild {
   constructor (args) {
@@ -65,9 +65,19 @@ export default class PolymerBuild {
 
     this.args = formatArguments(args || this.argv)
 
-    if (!/^(\/|\w+:\/{2}).+\/$/.test(this.args.baseURI)) {
-      throw Error('Invalid argument baseURI. Please use `/path/to/use/` or `http://exemple.com/` format')
+    if (!this.__isValidBaseURI(this.args.baseURI)) {
+      throw Error(`Invalid argument baseURI (${this.args.baseURI}). Please use '/path/to/use/' or 'http://exemple.com/' format`)
     }
+  }
+
+  /**
+   * Return true if the baseURI is valid.
+   * @private
+   * @param {String} baseURI - Base URI.
+   * @return {Boolean} True if the baseURI is valid.
+   */
+  __isValidBaseURI (baseURI) {
+    return (/^((\/|\w+:\/{2}).+)?\/$/.test(baseURI))
   }
 
   /**
@@ -118,7 +128,7 @@ export default class PolymerBuild {
    */
   formatHtaccess = () => {
     const sampleFile = 'htaccess.sample'
-    logger.log(`Copy of ${sampleFile} to ${this.buildDir}.htaccess ...`)
+    logger.info(`Copy of ${sampleFile} to ${this.buildDir}.htaccess ...`)
 
     if (!fs.existsSync(sampleFile)) {
       throw Error(`${sampleFile} file not found`)
@@ -133,7 +143,7 @@ export default class PolymerBuild {
 
     fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
 
-    logger.log('Copy completed!')
+    logger.info('Copy completed!')
   }
 
   /**
@@ -220,9 +230,10 @@ export default class PolymerBuild {
    * @param {String} buildName - Build name from arguments or polymer config.
    */
   updateBuildFiles = (buildName) => {
-    this.buildDir = `${this.args.dir}${buildName}/`
     this.baseURL = this.getBaseURL(buildName)
-    logger.log(`Build directory: ${this.buildDir}`)
+    this.buildDir = `${this.args.dir}${buildName}/`
+
+    logger.info(`Build directory: ${this.buildDir}`)
 
     this.formatIndexHtml()
 
