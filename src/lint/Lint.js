@@ -50,6 +50,10 @@ export default class Lint {
     this.argv = yargs
       .usage('Usage: udes lint [-d] [--html] [--js] [-p]')
       .describe('If no flags are specified, all available commands will be used')
+      .option('dir', {
+        alias: 'd',
+        describe: 'Base directory to execute commands',
+      })
       .option('html', {
         describe: 'Lint HTML files if set',
         default: false,
@@ -62,10 +66,6 @@ export default class Lint {
         alias: 'p',
         describe: 'Use polymer lint if set',
         default: false,
-      })
-      .option('dir', {
-        alias: 'd',
-        describe: 'Base directory to execute commands',
       })
       .alias('h', 'help')
       .help('h')
