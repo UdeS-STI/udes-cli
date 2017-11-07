@@ -17,31 +17,20 @@ export default class Publish {
    * Execute code for building polymer project.
    */
   run = () => {
-
+    this.bumpVersion()
   }
 
   /**
    * Validate CLI arguments.
    */
   validateArgv = () => {
-    this.argv = yargs.usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
-      .option('type', {
-        alias: 't',
+    this.argv = yargs
+      .usage('Usage: $0 -r rootURI [--buildName name1 name2 ...] [-a addBuildDir]')
+      .option('releaseType', {
+        alias: '',
         describe: 'Type of release',
         choices: ['major', 'minor', 'patch'],
       })
-      .option('buildName', {
-        alias: 'b',
-        describe: 'Choose a build',
-        choices: ['bundled', 'unbundled', 'es5-bundled', 'es6-bundled', 'es6-unbundled'],
-        type: 'array',
-      })
-      .option('rootURI', {
-        alias: 'u',
-        describe: 'Choose a build',
-      })
-      .array('buildName')
-      .demandOption(['rootURI'], 'Please provide -rootURI argument to work with this build')
       .help('h')
       .alias('h', 'help')
       .argv
@@ -54,5 +43,9 @@ export default class Publish {
    */
   formatArguments = (args) => {
     return args
+  }
+
+  bumpVersion = () => {
+
   }
 }
