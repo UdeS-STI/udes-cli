@@ -1,5 +1,6 @@
 import yargs from 'yargs'
 
+import Bower from './bower/Bower'
 import Lint from './lint/Lint'
 import PolymerBuild from './polymer/PolymerBuild'
 
@@ -29,6 +30,10 @@ export default class UdeSCLI {
     let commandInstance
 
     switch (command) {
+      case 'bower':
+        commandInstance = new Bower()
+        commandInstance.run()
+        break
       case 'polymer-build':
         commandInstance = new PolymerBuild()
         commandInstance.run()
