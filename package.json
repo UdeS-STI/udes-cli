@@ -1,13 +1,12 @@
 {
   "name": "udes-cli",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
-    "cpx": "^1.5.0",
-    "replace-in-file": "^2.5.3",
-    "shelljs": "0.7.8",
+    "shelljs": "^0.7.8",
+    "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.5",
-    "yargs": "9.0.1"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -16,9 +15,10 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
-    "eslint-config-udes": "^0.1.5",
+    "cross-env": "^5.1.1",
+    "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
-    "nsp": "2.8.1",
+    "nsp": "^3.0.0",
     "nyc": "^11.2.1",
     "sinon": "^4.0.2",
     "sinon-chai": "^2.14.0"
@@ -26,10 +26,11 @@
   "scripts": {
     "audit": "node_modules/.bin/nsp check",
     "build": "babel ./src --out-dir dist --ignore '**/*Test.js'",
-    "coverage": "NODE_ENV=test node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
-    "lint": "eslint ./src; eslint ./bin",
-    "test": "NODE_ENV=test mocha --compilers js:babel-core/register --opts ../mocha.opts ./src/**/**Test.js",
-    "udes-polymer-build": "udes polymer-build"
+    "coverage": "cross-env NODE_ENV=test NOLOG=true node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
+    "format": "eslint . --ignore-path .gitignore --fix",
+    "lint": "node bin/udes lint . --js",
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "cross-env NODE_ENV=test NOLOG=true mocha --require babel-core/register --opts ../mocha.opts ./src/**/**Test.js"
   },
   "bin": {
     "udes": "bin/udes.js"

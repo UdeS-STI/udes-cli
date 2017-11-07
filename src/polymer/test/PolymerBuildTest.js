@@ -6,7 +6,7 @@ import fs from 'fs'
 
 import PolymerBuild from './../PolymerBuild'
 
-const files = ['_index.html', 'index.php', 'script.js']
+const files = ['index.html', 'index.php', 'script.js']
 const deleteFolderRecursive = (path) => {
   fs.readdirSync(path).forEach((file) => {
     const currentPath = `${path}/${file}`
@@ -21,54 +21,79 @@ const deleteFolderRecursive = (path) => {
 }
 
 describe('PolymerBuild', () => {
-  before(() => {
-    if (!fs.existsSync('build')) {
-      fs.mkdirSync('build')
-      fs.mkdirSync('build/bundled')
-    }
+  describe('constructor', () => {
+    it('should throw an error if argument `rootURI` is missing', () => {
+      const options = {buildNames: []}
+      expect(() => new PolymerBuild(options)).to.throw(Error)
+    })
 
-    // TODO: Use fs.copyFileSync() after updating to node 8.
-    fs.writeFileSync('htaccess.sample', fs.readFileSync(`${__dirname}/assets/htaccess.sample`))
-  })
+    it('should not throw an error for correct baseURIs', () => {
+      const baseURIs = [
+        '/',
+        '/~ranb2002/',
+        '/www.exemple.com/',
+        'https://www.exemple.com/',
+        'https://www.exemple.com/~ranb2002/',
+      ]
 
-  beforeEach(() => {
-    files.forEach((filename) => {
-      // TODO: Use fs.copyFileSync() after updating to node 8.
-      fs.writeFileSync(`build/bundled/${filename}`, fs.readFileSync(`${__dirname}/assets/${filename}`))
+      baseURIs.forEach(baseURI => {
+        const options = {baseURI, buildNames: []}
+        expect(() => new PolymerBuild(options)).not.to.throw(Error)
+      })
+    })
+
+    it('should throw an error for invalid baseURIs', () => {
+      const baseURIs = [
+        '/~ranb2002',
+        '/www.exemple.com',
+        'https://www.exemple.com',
+        'https://www.exemple.com/~ranb2002',
+        '~ranb2002/',
+        'www.exemple.com/',
+      ]
+
+      baseURIs.forEach(baseURI => {
+        const options = {baseURI, buildNames: []}
+        expect(() => new PolymerBuild(options)).to.throw(Error)
+      })
     })
   })
 
-  after(() => {
-    deleteFolderRecursive('build')
-    fs.unlinkSync('htaccess.sample')
-  })
-
   describe('run', () => {
-    it('should throw error if argument `rootURI` is missing', () => {
-      let error
-
-      try {
-        // eslint-disable-next-line no-unused-vars
-        const polymerBuild = new PolymerBuild({})
-      } catch (err) {
-        error = err
+    before(() => {
+      if (!fs.existsSync('build')) {
+        fs.mkdirSync('build')
+        fs.mkdirSync('build/bundled')
       }
 
-      expect(error).to.be.not.undefined
+      // TODO: Use fs.copyFileSync() after updating to node 8.
+      fs.writeFileSync('htaccess.sample', fs.readFileSync(`${__dirname}/assets/htaccess.sample`))
+    })
+
+    beforeEach(() => {
+      files.forEach((filename) => {
+        // TODO: Use fs.copyFileSync() after updating to node 8.
+        fs.writeFileSync(`build/bundled/${filename}`, fs.readFileSync(`${__dirname}/assets/${filename}`))
+      })
+    })
+
+    after(() => {
+      deleteFolderRecursive('build')
+      fs.unlinkSync('htaccess.sample')
     })
 
     it('should create build for production', () => {
       const options = {
+        baseURI: '/src/',
         build: false,
-        buildName: ['bundled'],
-        rootURI: '/src',
+        buildNames: ['bundled'],
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
 
       const indexHtml = fs.readFileSync('build/bundled/index.html').toString()
 
-      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/" /><script>const hello="world";hello.replace("world","foo");</script></head><body></body></html>\n')
+      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
       expect(fs.existsSync('build/bundled/index.php')).to.be.false
       expect(fs.existsSync('build/bundled/script.js')).to.be.false
       expect(fs.existsSync('build/bundled/.htaccess')).to.be.false
@@ -76,21 +101,23 @@ describe('PolymerBuild', () => {
 
     it('should create build for dev', () => {
       const options = {
+        addBuildDir: true,
+        addBuildName: true,
+        baseURI: '/src/',
         build: false,
-        buildName: ['bundled'],
-        rewriteBuildDev: true,
-        rootURI: '/src',
+        buildNames: ['bundled'],
+        copyHtaccessSample: true,
       }
       const polymerBuild = new PolymerBuild(options)
       polymerBuild.run()
 
-      const indexHtml = fs.readFileSync('build/bundled/_index.html').toString()
+      const indexHtml = fs.readFileSync('build/bundled/index.html').toString()
       const indexPhp = fs.readFileSync('build/bundled/index.php').toString()
       const htaccess = fs.readFileSync('build/bundled/.htaccess').toString()
 
-      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled" /><script>const hello="world";hello.replace("world","foo");</script></head><body></body></html>\n')
+      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled/" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
       expect(indexPhp).to.be.equal('<?php echo "This is a PHP file"; ?>\n')
-      expect(htaccess).to.be.equal('RewriteBase /src/build/bundled\n')
+      expect(htaccess).to.be.equal('RewriteBase /src/build/bundled/\n')
       expect(fs.existsSync('build/bundled/script.js')).to.be.false
     })
   })
