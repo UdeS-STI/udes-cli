@@ -14,7 +14,11 @@ export default class Bower {
     }
 
     this.args = this.formatArguments(args || this.argv)
-    this.shell = shell
+    this.shell = {
+      exec (arg) {
+        console.log(arg)
+      },
+    }
 
     if (!this[this.args.command]) {
       throw new Error('Invalid command')
@@ -61,12 +65,11 @@ export default class Bower {
    * @param {Object} args - Arguments passed through command line.
    * @returns {Object} Arguments in a formatted object.
    */
-  formatArguments = (args) => {
-    return {
-      command: args.command,
-      packageName: args.package,
-    }
-  }
+  formatArguments = args => ({
+    command: args.command,
+    options: this.argv ? process.argv.filter(argv => /^-/.test(argv)) : args.options || [],
+    packageName: args.package,
+  })
 
   /**
    * Handle install command.
@@ -88,7 +91,7 @@ export default class Bower {
    */
   installPackage = (packageName) => {
     this.unlock()
-    this.shell.exec(`bower install ${packageName}`)
+    this.shell.exec(`bower install ${packageName} ${this.args.options.join(' ')}`)
     this.lock()
   }
 

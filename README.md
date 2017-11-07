@@ -50,7 +50,7 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run udes bower install bower-package
+npm run udes bower install bower-package --save
 npm run udes format .
 npm run udes lint .
 npm run udes polymer-build --baseURI /path/to/project/
