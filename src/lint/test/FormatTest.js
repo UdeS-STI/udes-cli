@@ -1,95 +1,16 @@
 /* eslint-env mocha */
 import 'babel-polyfill'
-import chai, { expect } from 'chai'
-import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
+import { expect } from 'chai'
 
 import Format from '../Format'
 
-chai.use(sinonChai)
-
-let hasEslintConfig
-let hasHtmlHintConfig
-let isPolymerProject
-
-const htmlformat = 'eslint . --ext html --ignore-path .gitignore --fix'
-const jsformat = 'eslint . --ext js,json --ignore-path .gitignore --fix'
-const polymerformat = 'polymer lint --fix'
-
-const getFormatInstance = (args = {}) => {
-  const format = new Format({
-    ...args,
-    path: '.',
-  })
-
-  format.shell.exec = sinon.spy()
-  format.hasEslintConfig = () => hasEslintConfig
-  format.hasHtmlHintConfig = () => hasHtmlHintConfig
-  format.isPolymerProject = () => isPolymerProject
-
-  return format
-}
-
 describe('Format', () => {
   describe('constructor', () => {
-    it('should set all argument flags to true if none are set', () => {
-      Object.values((new Format({ path: '.' })).args).forEach(arg =>
-        expect(!!arg).to.be.true
-      )
-    })
-  })
-
-  describe('run', () => {
-    beforeEach(() => {
-      hasEslintConfig = true
-      hasHtmlHintConfig = true
-      isPolymerProject = true
-    })
-
-    it('should format html and js files if no fag is set and is not a polymer project.', () => {
-      isPolymerProject = false
-      const format = getFormatInstance()
-      format.run()
-
-      expect(format.shell.exec).to.be.calledWith(htmlformat)
-      expect(format.shell.exec).to.be.calledWith(jsformat)
-      expect(format.shell.exec).to.not.be.calledWith(polymerformat)
-    })
-
-    it('should format html and js files and polymer project if no flag is set and is a polymer project', () => {
-      const format = getFormatInstance()
-      format.run()
-
-      expect(format.shell.exec).to.be.calledWith(htmlformat)
-      expect(format.shell.exec).to.be.calledWith(jsformat)
-      expect(format.shell.exec).to.be.calledWith(polymerformat)
-    })
-
-    it('should format html files if html flag is set', () => {
-      const format = getFormatInstance({ html: true })
-      format.run()
-
-      expect(format.shell.exec).to.be.calledWith(htmlformat)
-      expect(format.shell.exec).to.not.be.calledWith(jsformat)
-      expect(format.shell.exec).to.not.be.calledWith(polymerformat)
-    })
-
-    it('should format js files if js flag is set', () => {
-      const format = getFormatInstance({ js: true })
-      format.run()
-
-      expect(format.shell.exec).to.not.be.calledWith(htmlformat)
-      expect(format.shell.exec).to.be.calledWith(jsformat)
-      expect(format.shell.exec).to.not.be.calledWith(polymerformat)
-    })
-
-    it('should format polymer project if polymer flag is set and is polymer project', () => {
-      const format = getFormatInstance({ polymer: true })
-      format.run()
-
-      expect(format.shell.exec).to.not.be.calledWith(htmlformat)
-      expect(format.shell.exec).to.not.be.calledWith(jsformat)
-      expect(format.shell.exec).to.be.calledWith(polymerformat)
+    it('should set correct bash commands', () => {
+      const lint = new Format({ path: '.' })
+      expect(lint.commands.html()).to.be.equal('eslint . --ext html --ignore-path .gitignore --fix')
+      expect(lint.commands.js()).to.be.equal('eslint . --ext js,json --ignore-path .gitignore --fix')
+      expect(lint.commands.polymer).to.be.equal('polymer lint --fix')
     })
   })
 })
