@@ -22,8 +22,6 @@ If you want to test or develop on the library simply run these commands
 git clone git@github.com:UdeS-STI/udes-cli.git
 cd udes-cli
 npm install
-# Allows using the CLI directly within the package for testing.
-ln -s `pwd` node_modules/udes-cli
 ```
 
 ## Add to project
@@ -56,18 +54,6 @@ npm run udes polymer-build --baseURI /path/to/project/
 TODO
 
 # Contributing
-## Structure
-```
-.
-├── bin
-|   └── udes (CLI entry point)
-└── src
-    ├── UdeSCLI (main class, handles all CLI requests)
-    ├── lib (utility files)
-    └── CLI class directories
-```
-* Source files must be added to the `src` directory.
-
 ## Style
 You must use the following guides:
 * [UdeS JavaScript Style Guide](https://www.npmjs.com/package/eslint-config-udes)

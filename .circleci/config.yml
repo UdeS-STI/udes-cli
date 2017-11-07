@@ -17,6 +17,9 @@ jobs:
             - ./node_modules
             - ~/.cache/npm
       - run:
+          name: build
+          command: npm run build
+      - run:
           name: linter
           command: npm run lint
       - run:
