@@ -1,9 +1,5 @@
 import yargs from 'yargs'
 
-const formatArguments = (args) => {
-  return args
-}
-
 /**
  * @class
  */
@@ -14,7 +10,14 @@ export default class Publish {
     } else if (!args.rootURI) {
       throw new Error('Please provide rootURI argument to work with this build')
     }
-    this.args = formatArguments(args || this.argv)
+    this.args = this.formatArguments(args || this.argv)
+  }
+
+  /**
+   * Execute code for building polymer project.
+   */
+  run = () => {
+
   }
 
   /**
@@ -45,9 +48,11 @@ export default class Publish {
   }
 
   /**
-   * Execute code for building polymer project.
+   * @private
+   * @param args
+   * @returns {*}
    */
-  run() {
-
+  formatArguments = (args) => {
+    return args
   }
 }
