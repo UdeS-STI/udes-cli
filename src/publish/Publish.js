@@ -29,7 +29,7 @@ export default class Publish {
       .option('releaseType', {
         alias: '',
         describe: 'Type of release',
-        choices: ['major', 'minor', 'patch'],
+        choices: ['major', 'premajor', 'minor', 'preminor', 'patch', 'prepatch'],
       })
       .help('h')
       .alias('h', 'help')
