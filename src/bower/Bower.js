@@ -30,7 +30,14 @@ export default class Bower {
           .positional('command', {
             describe: 'bower command to execute',
           })
-      }, argv => {
+          .positional('package', {
+            describe: 'package to install',
+          })
+      }, (argv) => {
+        const PACKAGE_INDEX = 1
+        if (argv.command === 'install' && argv._[PACKAGE_INDEX]) {
+          argv.package = argv._[PACKAGE_INDEX]
+        }
       })
       .usage('Usage: udes bower <command> <package>')
       .describe('Execute bower and bower-locker tasks')
@@ -45,14 +52,21 @@ export default class Bower {
    * @param {Object} args - Arguments passed through command line.
    * @returns {Object} Arguments in a formatted object.
    */
-  formatArguments = ({ command }) => ({ command })
+  formatArguments = (args) => {
+    return {
+      command: args.command,
+      packageName: args.package,
+    }
+  }
 
   /**
    * Execute code for building polymer project.
    */
   run = () => {
-    if (this[this.args.command]) {
-      this[this.args.command]()
+    const { command, packageName } = this.args
+
+    if (this[command]) {
+      this[command](packageName)
     } else {
       throw new Error('Invalid command')
     }
