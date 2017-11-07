@@ -1,6 +1,6 @@
 {
   "name": "udes-cli",
-  "version": "0.3.1-0",
+  "version": "0.3.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
     "shelljs": "^0.7.8",

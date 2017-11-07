@@ -3,6 +3,7 @@ import yargs from 'yargs'
 import Format from './lint/Format'
 import Lint from './lint/Lint'
 import PolymerBuild from './polymer/PolymerBuild'
+import Publish from './publish/Publish'
 
 /**
  * Dispatch commands to proper class.
@@ -18,6 +19,7 @@ export default class UdeSCLI {
       .command('format', 'Format files using linting tools')
       .command('lint', 'Run linting tools for html, js and json files and for polymer projects')
       .command('polymer-build', 'Build a polymer repo for release')
+      .command('publish', 'Publish an npm package')
       .help('h')
       .alias('h', 'help')
       .argv
@@ -41,6 +43,10 @@ export default class UdeSCLI {
         break
       case 'polymer-build':
         commandInstance = new PolymerBuild()
+        commandInstance.run()
+        break
+      case 'publish':
+        commandInstance = new Publish()
         commandInstance.run()
         break
       default:
