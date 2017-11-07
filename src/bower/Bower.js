@@ -14,11 +14,7 @@ export default class Bower {
     }
 
     this.args = this.formatArguments(args || this.argv)
-    this.shell = {
-      exec (arg) {
-        console.log(arg)
-      },
-    }
+    this.shell = shell
 
     if (!this[this.args.command]) {
       throw new Error('Invalid command')
