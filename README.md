@@ -36,6 +36,7 @@ from the library
 {
   "scripts": {
     "build": "udes polymer-build -u /dir/ --buildNames bundled -ac",
+    "format": "udes format .",
     "install": "udes bower install",
     "lint": "udes lint .",
     "lock": "udes bower lock",
@@ -49,7 +50,8 @@ from the library
 # Usage
 ## Command Line
 ```bash
-npm run udes install bower-package
+npm run udes bower install bower-package
+npm run udes format .
 npm run udes lint .
 npm run udes polymer-build --baseURI /path/to/project/
 ``` 
