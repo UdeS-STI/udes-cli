@@ -40,7 +40,7 @@ from the library
     "lint": "udes lint .",
     "lock": "udes bower lock",
     "status": "udes bower status",
-    "unlock": "udes bower unlock"
+    "unlock": "udes bower unlock",
     "validate": "udes bower validate"
   }
 }
