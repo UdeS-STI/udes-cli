@@ -88,11 +88,11 @@ export default class Lintable {
   run = () => {
     const { html, js, polymer } = this.commands
 
-    if (this.args.html) {
+    if (this.args.html && this.hasHtmlHintConfig()) {
       this.shell.exec(this.getCommand(html))
     }
 
-    if (this.args.js) {
+    if (this.args.js && this.hasEslintConfig()) {
       this.shell.exec(this.getCommand(js))
     }
 
@@ -108,6 +108,20 @@ export default class Lintable {
    * @returns {String} Bash command.
    */
   getCommand = command => typeof command === 'function' ? command() : command
+
+  /**
+   * Determines whether the project has an eslint config file.
+   * @private
+   * @returns {Boolean} true if .eslintrc.js file is found.
+   */
+  hasEslintConfig = () => fs.existsSync('./.eslintrc.js')
+
+  /**
+   * Determines whether the project has an HTML hint file.
+   * @private
+   * @returns {Boolean} true if .htmlhintrc.json file is found.
+   */
+  hasHtmlHintConfig = () => fs.existsSync('./.htmlhintrc.json')
 
   /**
    * Determines whether the project is polymer project.
