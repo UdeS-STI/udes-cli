@@ -8,6 +8,8 @@ import Lint from './../Lint'
 
 chai.use(sinonChai)
 
+let hasEslintConfig
+let hasHtmlHintConfig
 let isPolymerProject
 
 const htmlLint = 'htmlhint ./*/.html --config .htmlhintrc.json'
@@ -21,6 +23,8 @@ const getLintInstance = (args = {}) => {
   })
 
   lint.shell.exec = sinon.spy()
+  lint.hasEslintConfig = () => hasEslintConfig
+  lint.hasHtmlHintConfig = () => hasHtmlHintConfig
   lint.isPolymerProject = () => isPolymerProject
 
   return lint
@@ -37,6 +41,8 @@ describe('Lint', () => {
 
   describe('run', () => {
     beforeEach(() => {
+      hasEslintConfig = true
+      hasHtmlHintConfig = true
       isPolymerProject = true
     })
 

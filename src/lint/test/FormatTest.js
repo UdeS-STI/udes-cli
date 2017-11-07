@@ -8,6 +8,8 @@ import Format from '../Format'
 
 chai.use(sinonChai)
 
+let hasEslintConfig
+let hasHtmlHintConfig
 let isPolymerProject
 
 const htmlformat = 'eslint . --ext html --ignore-path .gitignore --fix'
@@ -21,6 +23,8 @@ const getFormatInstance = (args = {}) => {
   })
 
   format.shell.exec = sinon.spy()
+  format.hasEslintConfig = () => hasEslintConfig
+  format.hasHtmlHintConfig = () => hasHtmlHintConfig
   format.isPolymerProject = () => isPolymerProject
 
   return format
@@ -37,6 +41,8 @@ describe('Format', () => {
 
   describe('run', () => {
     beforeEach(() => {
+      hasEslintConfig = true
+      hasHtmlHintConfig = true
       isPolymerProject = true
     })
 
