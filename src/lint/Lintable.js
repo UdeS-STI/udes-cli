@@ -72,10 +72,8 @@ export default class Lintable {
 
     if (!html && !js && !polymer) {
       return {
-        html: true,
-        js: true,
+        all: true,
         path,
-        polymer: true,
       }
     }
 
@@ -86,18 +84,23 @@ export default class Lintable {
    * Format project.
    */
   run = () => {
-    const { html, js, polymer } = this.commands
+    this.executeCommand('html', this.hasHtmlHintConfig())
+    this.executeCommand('js', this.hasEslintConfig())
+    this.executeCommand('polymer', this.isPolymerProject())
+  }
 
-    if (this.args.html && this.hasHtmlHintConfig()) {
-      this.shell.exec(this.getCommand(html))
-    }
-
-    if (this.args.js && this.hasEslintConfig()) {
-      this.shell.exec(this.getCommand(js))
-    }
-
-    if (this.args.polymer && this.isPolymerProject()) {
-      this.shell.exec(this.getCommand(polymer))
+  /**
+   * Execute shell commands for specified type of files.
+   * @private
+   * @param {html|js|polymer} type - Type of lintable files.
+   * @param {Boolean} hasConfig - True if config file exists for specified type.
+   * @throws {Error} When type flag is true but config does not exist.
+   */
+  executeCommand = (type, hasConfig) => {
+    if ((this.args.all || this.args[type]) && hasConfig) {
+      this.shell.exec(this.getCommand(this.commands[type]))
+    } else if (this.args[type] && !hasConfig) {
+      throw new Error(`Cannot find ${type} config file`)
     }
   }
 
