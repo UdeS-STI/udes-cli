@@ -5,23 +5,32 @@ import yargs from 'yargs'
  * Class to handle actions related to building a polymer project.
  * @class
  * @param {Object} args - Bower arguments when not using command line.
+ * @throws {Error} When invalid command is entered.
  */
 export default class Bower {
-  constructor(args) {
+  constructor (args) {
     if (!args) {
       this.validateArgv()
     }
 
     this.args = this.formatArguments(args || this.argv)
-    this.shell = {
-      exec (arg) {
-        console.log(arg)
-      },
+    this.shell = shell
+
+    if (!this[this.args.command]) {
+      throw new Error('Invalid command')
     }
   }
 
   /**
+   * Execute bower tasks.
+   */
+  run = () => {
+    this[this.args.command](this.args.packageName)
+  }
+
+  /**
    * Validate CLI arguments.
+   * @private
    */
   validateArgv = () => {
     this.argv = yargs
@@ -60,30 +69,58 @@ export default class Bower {
   }
 
   /**
-   * Execute code for building polymer project.
+   * Handle install command.
+   * @private
+   * @param {String} [packageName] - Package to install.
    */
-  run = () => {
-    const { command, packageName } = this.args
-
-    if (this[command]) {
-      this[command](packageName)
-    } else {
-      throw new Error('Invalid command')
-    }
-  }
-
   install = (packageName) => {
     if (packageName) {
-      this.unlock()
-      this.shell.exec(`bower install ${packageName}`)
-      this.lock()
+      this.installPackage(packageName)
     } else {
       this.shell.exec('bower install')
     }
   }
 
-  lock = () => this.shell.exec('bower-locker lock')
-  status = () => this.shell.exec('bower-locker status')
-  unlock = () => this.shell.exec('bower-locker unlock')
-  validate = () => this.shell.exec('bower-locker validate')
+  /**
+   * Install a new package.
+   * @private
+   * @param {String} packageName - Package to install.
+   */
+  installPackage = (packageName) => {
+    this.unlock()
+    this.shell.exec(`bower install ${packageName}`)
+    this.lock()
+  }
+
+  /**
+   * Handle lock command.
+   * @private
+   */
+  lock = () => {
+    this.shell.exec('bower-locker lock')
+  }
+
+  /**
+   * Handle status command.
+   * @private
+   */
+  status = () => {
+    this.shell.exec('bower-locker status')
+  }
+
+  /**
+   * Handle unlock command.
+   * @private
+   */
+  unlock = () => {
+    this.shell.exec('bower-locker unlock')
+  }
+
+  /**
+   * Handle validate command.
+   * @private
+   */
+  validate = () => {
+    this.shell.exec('bower-locker validate')
+  }
 }
