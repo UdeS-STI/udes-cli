@@ -2,6 +2,8 @@ import fs from 'fs'
 import shell from 'shelljs'
 import yargs from 'yargs'
 
+import { udesLogger } from 'udes-logger'
+
 /**
  * Class to handle actions related to building a polymer project.
  * @class
@@ -84,9 +86,15 @@ export default class Lintable {
    * Format project.
    */
   run = () => {
-    this.executeCommand('html', this.hasHtmlHintConfig())
-    this.executeCommand('js', this.hasEslintConfig())
-    this.executeCommand('polymer', this.isPolymerProject())
+    try {
+      this.executeCommand('html', this.hasHtmlHintConfig())
+      this.executeCommand('js', this.hasEslintConfig())
+      this.executeCommand('polymer', this.isPolymerProject())
+      process.exit(0)
+    } catch (error) {
+      udesLogger.error(error)
+      process.exit(1)
+    }
   }
 
   /**
@@ -98,7 +106,10 @@ export default class Lintable {
    */
   executeCommand = (type, hasConfig) => {
     if ((this.args.all || this.args[type]) && hasConfig) {
-      this.shell.exec(this.getCommand(this.commands[type]))
+      const { code } = this.shell.exec(this.getCommand(this.commands[type]))
+      if (code) {
+        process.exit(code)
+      }
     } else if (this.args[type] && !hasConfig) {
       throw new Error(`Cannot find ${type} config file`)
     }
