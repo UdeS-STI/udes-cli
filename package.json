@@ -6,11 +6,7 @@
     "shelljs": "^0.7.8",
     "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.8",
-    "yargs": "^10.0.3",
-    "polymer-cli": "^1.5.7",
-    "eslint-config-udes": "^0.1.6",
-    "@udes/bower-locker": "^1.0.6",
-    "bower": "^1.8.2"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -20,6 +16,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "cross-env": "^5.1.1",
+    "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
     "nsp": "^3.1.0",
     "nyc": "^11.3.0",
