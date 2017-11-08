@@ -44,7 +44,9 @@ export default class Bower {
               'install',
               'lock',
               'status',
+              'uninstall',
               'unlock',
+              'update',
               'validate',
             ],
           })
@@ -102,16 +104,26 @@ export default class Bower {
   }
 
   /**
-   * Install new packages.
+   * Run a bower command.
    * @private
-   * @param {Array<String>} [packageNames=[]] - Packages to install.
+   * @param {install|uninstall|update} command - Bower command to execute.
+   * @param {[String]} [packageNames=[]] - Packages affected.
    */
-  install = (packageNames = []) => {
+  bowerExecute = (command, packageNames = []) => {
     const args = [...packageNames, ...this.args.options]
 
     this.unlock()
-    this.shell.exec(`bower install ${args.join(' ')}`.trim())
+    this.shell.exec(`bower ${command} ${args.join(' ')}`.trim())
     this.lock()
+  }
+
+  /**
+   * Install packages.
+   * @private
+   * @param {[String]} [packageNames] - Packages to install.
+   */
+  install = (packageNames = []) => {
+    this.bowerExecute('install', packageNames)
   }
 
   /**
@@ -131,11 +143,29 @@ export default class Bower {
   }
 
   /**
+   * Uninstall packages.
+   * @private
+   * @param {[String]} [packageNames] - Packages to uninstall.
+   */
+  uninstall = (packageNames = []) => {
+    this.bowerExecute('uninstall', packageNames)
+  }
+
+  /**
    * Handle unlock command.
    * @private
    */
   unlock = () => {
     this.shell.exec('bower-locker unlock')
+  }
+
+  /**
+   * Update packages.
+   * @private
+   * @param {[String]} [packageNames] - Packages to update.
+   */
+  update = (packageNames = []) => {
+    this.bowerExecute('update', packageNames)
   }
 
   /**

@@ -55,11 +55,61 @@ describe('Bower', () => {
       expect(bower.shell.exec).to.be.calledWith('bower-locker status')
     })
 
+    it('should execute `bower uninstall` when using `uninstall` command', () => {
+      const bower = getBowerInstance({ command: 'uninstall' })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower uninstall')
+    })
+
+    it('should execute install new package when using `uninstall` command with a package name', () => {
+      const bower = getBowerInstance({ command: 'uninstall', package: ['UdeSElements/udes-moment'], options: ['--save'] })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+      expect(bower.shell.exec).to.be.calledWith('bower uninstall UdeSElements/udes-moment --save')
+      expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
+    })
+
+    it('should execute install new packages when using `uninstall` command with multiple package names', () => {
+      const bower = getBowerInstance({ command: 'uninstall', package: ['UdeSElements/udes-moment', 'UdeSElements/udes-language-mixin'], options: ['--save'] })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+      expect(bower.shell.exec).to.be.calledWith('bower uninstall UdeSElements/udes-moment UdeSElements/udes-language-mixin --save')
+      expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
+    })
+
     it('should execute `bower-locker unlock` when using `unlock` command', () => {
       const bower = getBowerInstance({ command: 'unlock' })
       bower.run()
 
       expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+    })
+
+    it('should execute `bower update` when using `update` command', () => {
+      const bower = getBowerInstance({ command: 'update' })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower update')
+    })
+
+    it('should execute install new package when using `update` command with a package name', () => {
+      const bower = getBowerInstance({ command: 'update', package: ['UdeSElements/udes-moment'], options: ['--save'] })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+      expect(bower.shell.exec).to.be.calledWith('bower update UdeSElements/udes-moment --save')
+      expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
+    })
+
+    it('should execute install new packages when using `update` command with multiple package names', () => {
+      const bower = getBowerInstance({ command: 'update', package: ['UdeSElements/udes-moment', 'UdeSElements/udes-language-mixin'], options: ['--save'] })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+      expect(bower.shell.exec).to.be.calledWith('bower update UdeSElements/udes-moment UdeSElements/udes-language-mixin --save')
+      expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
     })
 
     it('should execute `bower-locker validate` when using `validate` command', () => {
