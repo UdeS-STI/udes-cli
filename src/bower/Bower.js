@@ -17,12 +17,13 @@ export default class Bower {
     this.shell = shell
 
     if (!this[this.args.command]) {
-      throw new Error('Invalid command')
+      throw new Error(`Invalid command: ${this.args.command}`)
     }
   }
 
   /**
    * Execute bower tasks.
+   * @public
    */
   run = () => {
     this[this.args.command](this.args.packageName)
@@ -34,21 +35,30 @@ export default class Bower {
    */
   validateArgv = () => {
     this.argv = yargs
-      .command('bower <command>', 'Use bower tools', (yargs) => {
+      .command('bower <command> [package] [options..]', 'Use bower tools', (yargs) => {
         yargs
           .positional('command', {
             describe: 'bower command to execute',
+            type: 'string',
+            choices: [
+              'install',
+              'lock',
+              'status',
+              'unlock',
+              'validate',
+            ],
           })
           .positional('package', {
             describe: 'package to install',
+            type: 'string',
           })
-      }, (argv) => {
-        const PACKAGE_INDEX = 1
-        if (argv.command === 'install' && argv._[PACKAGE_INDEX]) {
-          argv.package = argv._[PACKAGE_INDEX]
-        }
+          .positional('options', {
+            default: [],
+            describe: 'options to pass to bower',
+            type: 'array',
+          })
       })
-      .usage('Usage: udes bower <command> <package>')
+      .usage('Usage: udes bower <command> [package]')
       .describe('Execute bower and bower-locker tasks')
       .alias('h', 'help')
       .help('h')
@@ -61,11 +71,38 @@ export default class Bower {
    * @param {Object} args - Arguments passed through command line.
    * @returns {Object} Arguments in a formatted object.
    */
-  formatArguments = args => ({
-    command: args.command,
-    options: this.argv ? process.argv.filter(argv => /^-/.test(argv)) : args.options || [],
-    packageName: args.package,
-  })
+  formatArguments = args => {
+    const [packageName, options] = this.splitArgvIntoOptionsPackage(args)
+
+    console.log('packageName', packageName)
+    console.log('options', options)
+
+    return {
+      command: args.command,
+      options: options,
+      packageName: packageName,
+    }
+  }
+
+  /**
+   * Split the argv and return an array of [options, packageName].
+   * @private
+   * @param {Object} args - Arguments passed through command line.
+   * @returns {Array} Array of [options, packageName].
+   */
+  splitArgvIntoOptionsPackage = args => {
+    if (this.argv) {
+      // Remove the first four arguments from argv [node, udes, bower, install]
+      const [, , , , ...argv] = [...process.argv]
+
+      return argv.reduce((options, argv) => {
+        options[/^-/.test(argv) ? 1 : 0].push(argv)
+        return options
+      }, [[], []])
+    }
+
+    return [args.package, args.options || []]
+  }
 
   /**
    * Handle install command.
@@ -87,6 +124,7 @@ export default class Bower {
    */
   installPackage = (packageName) => {
     this.unlock()
+    console.log(`bower install ${packageName} ${this.args.options.join(' ')}`)
     this.shell.exec(`bower install ${packageName} ${this.args.options.join(' ')}`)
     this.lock()
   }
