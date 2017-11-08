@@ -5,22 +5,25 @@
   "dependencies": {
     "shelljs": "^0.7.8",
     "udes-logger": "^0.1.2",
-    "uglify-es": "^3.1.5",
-    "yargs": "^10.0.3"
+    "uglify-es": "^3.1.8",
+    "yargs": "^10.0.3",
+    "polymer-cli": "^1.5.7",
+    "eslint-config-udes": "^0.1.6",
+    "@udes/bower-locker": "^1.0.6",
+    "bower": "^1.8.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.0.1",
+    "babel-eslint": "^8.0.2",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "cross-env": "^5.1.1",
-    "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
-    "nsp": "^3.0.0",
-    "nyc": "^11.2.1",
-    "sinon": "^4.0.2",
+    "nsp": "^3.1.0",
+    "nyc": "^11.3.0",
+    "sinon": "^4.1.2",
     "sinon-chai": "^2.14.0"
   },
   "scripts": {
@@ -44,7 +47,7 @@
     "utils",
     "script"
   ],
-  "author": "JF Belisle <jfbelisle89@gmail.com>",
+  "author": "Université de Sherbrooke",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/UdeS-STI/udes-cli/issues"
