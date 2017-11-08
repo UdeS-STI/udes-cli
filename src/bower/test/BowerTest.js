@@ -24,11 +24,20 @@ describe('Bower', () => {
     })
 
     it('should execute install new package when using `install` command with a package name', () => {
-      const bower = getBowerInstance({ command: 'install', package: 'UdeSElements/udes-moment', options: ['--save'] })
+      const bower = getBowerInstance({ command: 'install', package: ['UdeSElements/udes-moment'], options: ['--save'] })
       bower.run()
 
       expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
       expect(bower.shell.exec).to.be.calledWith('bower install UdeSElements/udes-moment --save')
+      expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
+    })
+
+    it('should execute install new packages when using `install` command with multiple package names', () => {
+      const bower = getBowerInstance({ command: 'install', package: ['UdeSElements/udes-moment', 'UdeSElements/udes-language-mixin'], options: ['--save'] })
+      bower.run()
+
+      expect(bower.shell.exec).to.be.calledWith('bower-locker unlock')
+      expect(bower.shell.exec).to.be.calledWith('bower install UdeSElements/udes-moment UdeSElements/udes-language-mixin --save')
       expect(bower.shell.exec).to.be.calledWith('bower-locker lock')
     })
 

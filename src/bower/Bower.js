@@ -35,7 +35,7 @@ export default class Bower {
    */
   validateArgv = () => {
     this.argv = yargs
-      .command('bower <command> [package] [options..]', 'Use bower tools', (yargs) => {
+      .command('bower <command> [package..] [options..]', 'Use bower tools', (yargs) => {
         yargs
           .positional('command', {
             describe: 'bower command to execute',
@@ -49,8 +49,8 @@ export default class Bower {
             ],
           })
           .positional('package', {
-            describe: 'package to install',
-            type: 'string',
+            describe: 'package(s) to install',
+            type: 'array',
           })
           .positional('options', {
             default: [],
@@ -73,9 +73,6 @@ export default class Bower {
    */
   formatArguments = args => {
     const [packageName, options] = this.splitArgvIntoOptionsPackage(args)
-
-    console.log('packageName', packageName)
-    console.log('options', options)
 
     return {
       command: args.command,
@@ -105,27 +102,15 @@ export default class Bower {
   }
 
   /**
-   * Handle install command.
+   * Install new packages.
    * @private
-   * @param {String} [packageName] - Package to install.
+   * @param {Array<String>} [packageNames=[]] - Packages to install.
    */
-  install = (packageName) => {
-    if (packageName) {
-      this.installPackage(packageName)
-    } else {
-      this.shell.exec('bower install')
-    }
-  }
+  install = (packageNames = []) => {
+    const args = [...packageNames, ...this.args.options]
 
-  /**
-   * Install a new package.
-   * @private
-   * @param {String} packageName - Package to install.
-   */
-  installPackage = (packageName) => {
     this.unlock()
-    console.log(`bower install ${packageName} ${this.args.options.join(' ')}`)
-    this.shell.exec(`bower install ${packageName} ${this.args.options.join(' ')}`)
+    this.shell.exec(`bower install ${args.join(' ')}`.trim())
     this.lock()
   }
 
