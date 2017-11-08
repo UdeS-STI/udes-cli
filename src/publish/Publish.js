@@ -1,3 +1,4 @@
+import child_process from 'child_process'
 import shell from 'shelljs'
 import yargs from 'yargs'
 
@@ -37,10 +38,9 @@ export default class Publish {
 
   canRelease = () => {
     try {
-      const test = this.shell.exec('npm run lint', { silent: true }, (...arg) => console.log('ARGS', ...arg))
-      console.log(test)
-      this.shell.exec('npm run audit')
-      this.shell.exec('npm run test')
+      console.log('EXEC', `${child_process.execSync('npm run lint')}`)
+      // this.shell.exec('npm run audit')
+      // this.shell.exec('npm run test')
       console.log('can release')
       return true
     } catch (error) {
