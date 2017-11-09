@@ -28,6 +28,7 @@ export default class Lintable {
     this.args = this.formatArguments(args || this.argv)
     this.commands = commands
     this.shell = shell
+    this.process = process
   }
 
   /**
@@ -90,10 +91,10 @@ export default class Lintable {
       this.executeCommand('html', this.hasHtmlHintConfig())
       this.executeCommand('js', this.hasEslintConfig())
       this.executeCommand('polymer', this.isPolymerProject())
-      process.exit(0)
+      this.process.exit(0)
     } catch (error) {
       udesLogger.error(error)
-      process.exit(1)
+      this.process.exit(1)
     }
   }
 

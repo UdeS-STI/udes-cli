@@ -24,7 +24,9 @@ const getLintableInstance = (args = {}) => {
     polymer: polymerCommand,
   }, { ...args, path: '.' })
 
-  lintable.shell.exec = sinon.spy()
+  lintable.shell.exec = sinon.spy(() => 0)
+  lintable.process.exit = sinon.spy()
+
   lintable.hasEslintConfig = () => hasEslintConfig
   lintable.hasHtmlHintConfig = () => hasHtmlHintConfig
   lintable.isPolymerProject = () => isPolymerProject
@@ -50,20 +52,28 @@ describe('Lintable', () => {
       isPolymerProject = true
     })
 
-    it('should not throw error if no flag is set and no config file found', () => {
+    it('should not call any command if no flag is set and no config file found', () => {
       hasHtmlHintConfig = false
       hasEslintConfig = false
       isPolymerProject = false
-      expect(getLintableInstance().run).to.not.throw()
+
+      const lint = getLintableInstance()
+      lint.run()
+
+      expect(lint.shell.exec).to.not.be.calledWith(htmlCommand)
+      expect(lint.shell.exec).to.not.be.calledWith(jsCommand)
+      expect(lint.shell.exec).to.not.be.calledWith(polymerCommand)
+      expect(lint.process.exit).to.be.calledWith(0)
     })
 
-    it('should lint html and js files and polymer project if no flag is set and all ocnfig files are found', () => {
+    it('should lint html and js files and polymer project if no flag is set and all config files are found', () => {
       const lint = getLintableInstance()
       lint.run()
 
       expect(lint.shell.exec).to.be.calledWith(htmlCommand)
       expect(lint.shell.exec).to.be.calledWith(jsCommand)
       expect(lint.shell.exec).to.be.calledWith(polymerCommand)
+      expect(lint.process.exit).to.be.calledWith(0)
     })
 
     it('should lint html files if html flag is set', () => {
@@ -73,11 +83,15 @@ describe('Lintable', () => {
       expect(lint.shell.exec).to.be.calledWith(htmlCommand)
       expect(lint.shell.exec).to.not.be.calledWith(jsCommand)
       expect(lint.shell.exec).to.not.be.calledWith(polymerCommand)
+      expect(lint.process.exit).to.be.calledWith(0)
     })
 
-    it('should throw error if html flag is set but html hint config is not found', () => {
+    it('should exit with exit code 1 if html flag is set but html hint config is not found', () => {
       hasHtmlHintConfig = false
-      expect(getLintableInstance({ html: true }).run).to.throw()
+      const lint = getLintableInstance({ html: true })
+      lint.run()
+
+      expect(lint.process.exit).to.be.calledWith(1)
     })
 
     it('should lint js files if js flag is set', () => {
@@ -87,11 +101,15 @@ describe('Lintable', () => {
       expect(lint.shell.exec).to.not.be.calledWith(htmlCommand)
       expect(lint.shell.exec).to.be.calledWith(jsCommand)
       expect(lint.shell.exec).to.not.be.calledWith(polymerCommand)
+      expect(lint.process.exit).to.be.calledWith(0)
     })
 
-    it('should throw error if js flag is set but eslint config is not found', () => {
+    it('should exit with exit code 1 if js flag is set but eslint config is not found', () => {
       hasEslintConfig = false
-      expect(getLintableInstance({ js: true }).run).to.throw()
+      const lint = getLintableInstance({ js: true })
+      lint.run()
+
+      expect(lint.process.exit).to.be.calledWith(1)
     })
 
     it('should lint polymer project if polymer flag is set and is polymer project', () => {
@@ -101,11 +119,15 @@ describe('Lintable', () => {
       expect(lint.shell.exec).to.not.be.calledWith(htmlCommand)
       expect(lint.shell.exec).to.not.be.calledWith(jsCommand)
       expect(lint.shell.exec).to.be.calledWith(polymerCommand)
+      expect(lint.process.exit).to.be.calledWith(0)
     })
 
-    it('should throw error if polymer flag is set but is not a polymer project', () => {
+    it('should exit with exit code 1 if polymer flag is set but is not a polymer project', () => {
       isPolymerProject = false
-      expect(getLintableInstance({ polymer: true }).run).to.throw()
+      const lint = getLintableInstance({ polymer: true })
+      lint.run()
+
+      expect(lint.process.exit).to.be.calledWith(1)
     })
   })
 })
