@@ -3,6 +3,10 @@
   "version": "0.3.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
+    "@udes/bower-locker": "^1.0.6",
+    "bower": "^1.8.2",
+    "eslint-config-udes": "^0.1.6",
+    "polymer-cli": "^1.5.7",
     "shelljs": "^0.7.8",
     "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.5",
@@ -17,7 +21,6 @@
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "cross-env": "^5.1.1",
-    "eslint-config-udes": "^0.1.6",
     "mocha": "^4.0.1",
     "nsp": "^3.0.0",
     "nyc": "^11.2.1",

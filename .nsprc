@@ -1,0 +1,11 @@
+{
+  "org": "udes-sti",
+  "integration": "a84effa1-1302-420c-92fa-c7d772a60833",
+  "exceptions": [
+    "https://nodesecurity.io/advisories/535",
+    "https://nodesecurity.io/advisories/526",
+    "https://nodesecurity.io/advisories/550",
+    "https://nodesecurity.io/advisories/46",
+    "https://nodesecurity.io/advisories/534"
+  ]
+}
