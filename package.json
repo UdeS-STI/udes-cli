@@ -6,6 +6,7 @@
     "shelljs": "^0.7.8",
     "udes-logger": "^0.1.2",
     "uglify-es": "^3.1.5",
+    "update-notifier": "^2.3.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {

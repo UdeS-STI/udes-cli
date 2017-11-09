@@ -1,8 +1,16 @@
 import yargs from 'yargs'
+import updateNotifier from 'update-notifier'
 
 import Format from './lint/Format'
 import Lint from './lint/Lint'
 import PolymerBuild from './polymer/PolymerBuild'
+
+const pkg = require('../package.json')
+
+// Update Notifier: Asynchronously check for package updates and, 
+// if needed, notify on the next time the CLI is run.
+// See https://github.com/yeoman/update-notifier#how for info on how this works
+updateNotifier({pkg: pkg}).notify({defer: false})
 
 /**
  * Dispatch commands to proper class.
