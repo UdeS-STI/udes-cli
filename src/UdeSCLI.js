@@ -21,7 +21,7 @@ export default class UdeSCLI {
    * @see {@link https://github.com/yeoman/update-notifier#how|yeoman/update-notifier} for info on how this works
    * @private
    */
-  checkForUpdateAsync = async () => {
+  checkForUpdateAsync = () => {
     updateNotifier({ pkg }).notify({ defer: false })
   }
 
