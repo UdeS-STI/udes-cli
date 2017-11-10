@@ -1,6 +1,6 @@
 {
   "name": "udes-cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "CLI tools used at UdeS",
   "dependencies": {
     "@udes/bower-locker": "^1.0.6",
@@ -48,7 +48,7 @@
     "utils",
     "script"
   ],
-  "author": "JF Belisle <jfbelisle89@gmail.com>",
+  "author": "Université de Sherbrooke",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/UdeS-STI/udes-cli/issues"
