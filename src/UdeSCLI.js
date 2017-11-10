@@ -1,16 +1,32 @@
 import shell from 'shelljs'
 import yargs from 'yargs'
+import updateNotifier from 'update-notifier'
 
 import Bower from './bower/Bower'
 import Format from './lint/Format'
 import Lint from './lint/Lint'
 import PolymerBuild from './polymer/PolymerBuild'
+import pkg from '../package.json'
 
 /**
  * Dispatch commands to proper class.
  * @class
  */
 export default class UdeSCLI {
+  constructor () {
+    this.checkForUpdateAsync()
+  }
+
+  /**
+   * Asynchronously check for package updates and,
+   * if needed, notify on the next time the CLI is run.
+   * @see {@link https://github.com/yeoman/update-notifier#how|yeoman/update-notifier} for info on how this works
+   * @private
+   */
+  checkForUpdateAsync = () => {
+    updateNotifier({ pkg }).notify({ defer: false })
+  }
+
   /**
    * Display help information.
    */
