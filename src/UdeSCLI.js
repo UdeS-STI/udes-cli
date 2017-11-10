@@ -1,4 +1,3 @@
-import shell from 'shelljs'
 import yargs from 'yargs'
 import updateNotifier from 'update-notifier'
 
@@ -39,6 +38,7 @@ export default class UdeSCLI {
       .command('polymer-build', 'Build a polymer repo for release')
       .help('h')
       .alias('h', 'help')
+      .demandCommand()
       .argv
   }
 
@@ -50,9 +50,6 @@ export default class UdeSCLI {
     let commandInstance
 
     switch (command) {
-      case '-h':
-        this.help()
-        break
       case 'bower':
         commandInstance = new Bower()
         commandInstance.run()
@@ -70,7 +67,7 @@ export default class UdeSCLI {
         commandInstance.run()
         break
       default:
-        shell.exec(`node ${__dirname}/../bin/udes -h`)
+        this.help()
     }
   }
 }
