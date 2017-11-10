@@ -18,15 +18,15 @@ export default class Publish {
     this.args = this.formatArguments(args || this.argv)
   }
 
-  static RELEASE_TYPES = [
-    'major',
-    'minor',
-    'patch',
-    'premajor',
-    'preminor',
-    'prepatch',
-    'prerealease',
-  ]
+  static RELEASE_TYPES = {
+    MAJOR: 'major',
+    MINOR: 'minor',
+    PATCH: 'patch',
+    PREMAJOR: 'premajor',
+    PREMINOR: 'preminor',
+    PREPATCH: 'prepatch',
+    PRERELEASE: 'prerealease',
+  }
 
   checkoutMaster = async () => {
     await this.exec('git fetch')
@@ -130,7 +130,7 @@ export default class Publish {
       .option('type', {
         alias: 't',
         describe: 'Type of release',
-        choices: Publish.RELEASE_TYPES,
+        choices: Object.values(Publish.RELEASE_TYPES),
       })
       .demandOption(['type'], 'Please provide --type argument to publish')
       .help('h')
@@ -138,7 +138,7 @@ export default class Publish {
       .argv
   }
 
-  isValidType = type => Publish.RELEASE_TYPES.includes(type)
+  isValidType = type => Object.values(Publish.RELEASE_TYPES).includes(type)
 
   /**
    * @private
