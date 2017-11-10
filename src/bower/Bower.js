@@ -16,9 +16,19 @@ export default class Bower {
     this.args = this.formatArguments(args || this.argv)
     this.shell = shell
 
-    if (!this[this.args.command]) {
+    if (!Object.values(Bower.COMMANDS).includes(this.args.command)) {
       throw new Error(`Invalid command: ${this.args.command}`)
     }
+  }
+
+  static COMMANDS = {
+    INSTALL: 'install',
+    LOCK: 'lock',
+    STATUS: 'status',
+    UNINSTALL: 'uninstall',
+    UNLOCK: 'unlock',
+    UPDATE: 'update',
+    VALIDATE: 'validate',
   }
 
   /**
@@ -40,15 +50,7 @@ export default class Bower {
           .positional('command', {
             describe: 'bower command to execute',
             type: 'string',
-            choices: [
-              'install',
-              'lock',
-              'status',
-              'uninstall',
-              'unlock',
-              'update',
-              'validate',
-            ],
+            choices: Object.values(Bower.COMMANDS),
           })
           .positional('package', {
             describe: 'package(s) to install',
@@ -78,8 +80,8 @@ export default class Bower {
 
     return {
       command: args.command,
-      options: options,
-      packageName: packageName,
+      options,
+      packageName,
     }
   }
 
@@ -91,11 +93,13 @@ export default class Bower {
    */
   splitArgvIntoOptionsPackage = args => {
     if (this.argv) {
-      // Remove the first four arguments from argv [node, udes, bower, install]
-      const [, , , , ...argv] = [...process.argv]
+      const COMMAND_ARGUMENTS = 4
 
-      return argv.reduce((options, argv) => {
-        options[/^-/.test(argv) ? 1 : 0].push(argv)
+      return process.argv.reduce((options, argv, index) => {
+        if (index > COMMAND_ARGUMENTS) {
+          options[/^-/.test(argv) ? 1 : 0].push(argv)
+        }
+
         return options
       }, [[], []])
     }
