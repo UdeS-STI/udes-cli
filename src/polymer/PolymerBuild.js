@@ -171,6 +171,7 @@ export default class PolymerBuild {
 
     while (match) {
       const source = match[SOURCE_MATCH]
+      match = getInlineTag(string)
 
       if (!fs.existsSync(source)) {
         logger.warn(`The ${source} file could not be inlined`)
@@ -184,8 +185,6 @@ export default class PolymerBuild {
         new RegExp(`<script inline(="")? src="${source}"></script>`),
         `<script>${UglifyJS.minify(code).code}</script>`
       )
-
-      match = getInlineTag(string)
     }
 
     return string
