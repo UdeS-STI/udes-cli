@@ -6,7 +6,9 @@ import fs from 'fs'
 
 import PolymerBuild from './../PolymerBuild'
 
-const files = ['index.html', 'index.php', 'script.js']
+const buildFiles = ['index.html', 'index.php' ]
+const files = ['htaccess.sample', 'script.js']
+
 const deleteFolderRecursive = (path) => {
   fs.readdirSync(path).forEach((file) => {
     const currentPath = `${path}/${file}`
@@ -67,11 +69,13 @@ describe('PolymerBuild', () => {
       }
 
       // TODO: Use fs.copyFileSync() after updating to node 8.
-      fs.writeFileSync('htaccess.sample', fs.readFileSync(`${__dirname}/assets/htaccess.sample`))
+      files.forEach((filename) => {
+        fs.writeFileSync(filename, fs.readFileSync(`${__dirname}/assets/${filename}`))
+      })
     })
 
     beforeEach(() => {
-      files.forEach((filename) => {
+      buildFiles.forEach((filename) => {
         // TODO: Use fs.copyFileSync() after updating to node 8.
         fs.writeFileSync(`build/bundled/${filename}`, fs.readFileSync(`${__dirname}/assets/${filename}`))
       })
@@ -79,7 +83,9 @@ describe('PolymerBuild', () => {
 
     after(() => {
       deleteFolderRecursive('build')
-      fs.unlinkSync('htaccess.sample')
+      files.forEach((filename) => {
+        fs.unlinkSync(filename)
+      })
     })
 
     it('should create build for production', () => {

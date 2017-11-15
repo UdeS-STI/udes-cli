@@ -163,21 +163,27 @@ export default class PolymerBuild {
    */
   inlineJs = (html) => {
     const SOURCE_MATCH = 2
-    const getInlineTag = string => /<script inline(="")? src="([\w/~-]+.js)"><\/script>/.exec(string)
+    const regex = /<script inline(="")? src="([\w/~-]+.js)"><\/script>/g
+    const getInlineTag = string => regex.exec(string)
+
     let string = html
     let match = getInlineTag(string)
 
     while (match) {
       const source = match[SOURCE_MATCH]
-      const code = fs.readFileSync(`${this.buildDir}/${source}`).toString()
-
-      string = string.replace(
-        new RegExp(`<script inline(="")? src="${source}"></script>`),
-        `<script>${UglifyJS.minify(code).code}</script>`
-      )
-
-      fs.unlinkSync(`${this.buildDir}/${source}`)
       match = getInlineTag(string)
+
+      if (fs.existsSync(source)) {
+        logger.info(`Inline the ${source} file`)
+        const code = fs.readFileSync(`${source}`).toString()
+
+        string = string.replace(
+          new RegExp(`<script inline(="")? src="${source}"></script>`),
+          `<script>${UglifyJS.minify(code).code}</script>`
+        )
+      } else {
+        logger.warn(`The ${source} file could not be inlined`)
+      }
     }
 
     return string
