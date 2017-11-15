@@ -173,18 +173,17 @@ export default class PolymerBuild {
       const source = match[SOURCE_MATCH]
       match = getInlineTag(string)
 
-      if (!fs.existsSync(source)) {
+      if (fs.existsSync(source)) {
+        logger.info(`Inline the ${source} file`)
+        const code = fs.readFileSync(`${source}`).toString()
+
+        string = string.replace(
+          new RegExp(`<script inline(="")? src="${source}"></script>`),
+          `<script>${UglifyJS.minify(code).code}</script>`
+        )
+      } else {
         logger.warn(`The ${source} file could not be inlined`)
-        continue
       }
-
-      logger.info(`Inline the ${source} file`)
-      const code = fs.readFileSync(`${source}`).toString()
-
-      string = string.replace(
-        new RegExp(`<script inline(="")? src="${source}"></script>`),
-        `<script>${UglifyJS.minify(code).code}</script>`
-      )
     }
 
     return string
