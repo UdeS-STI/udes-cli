@@ -1,6 +1,6 @@
 {
     "name": "udes-cli",
-    "version": "0.4.2",
+    "version": "0.4.3",
     "description": "CLI tools used at UdeS",
     "dependencies": {
         "@udes/bower-locker": "^1.0.6",
@@ -29,7 +29,7 @@
     },
     "scripts": {
         "audit": "nsp check",
-        "build": "babel ./src --out-dir dist --ignore '**/*Test.js'",
+        "build": "babel ./src --out-dir dist --ignore '**/*Test.js' --ignore '**/test/**'",
         "coverage": "cross-env NODE_ENV=test NOLOG=true node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
         "format": "node bin/udes format . --js",
         "lint": "node bin/udes lint . --js",
