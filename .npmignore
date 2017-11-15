@@ -1,0 +1,11 @@
+.idea
+.nyc_output
+/node_modules/
+*.log
+src
+.circleci
+coverage
+.babelrc
+.eslintrc.js
+.nsprc
+mocha.opts
