@@ -13,7 +13,7 @@ export default class Lint extends Lintable {
   constructor (args) {
     super({
       html: () => `htmlhint ${this.args.path}/*/.html --config .htmlhintrc.json`,
-      js: () => `eslint ${this.args.path} --ext js,json --ignore-path .gitignore`,
+      js: () => `eslint ${this.args.path} --ext html,js,json --ignore-path .gitignore`,
       polymer: 'polymer lint',
     }, args)
   }

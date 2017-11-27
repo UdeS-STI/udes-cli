@@ -13,7 +13,7 @@ export default class Format extends Lintable {
   constructor (args) {
     super({
       html: () => `eslint ${this.args.path} --ext html --ignore-path .gitignore --fix`,
-      js: () => `eslint ${this.args.path} --ext js,json --ignore-path .gitignore --fix`,
+      js: () => `eslint ${this.args.path} --ext html,js,json --ignore-path .gitignore --fix`,
       polymer: 'polymer lint --fix',
     }, args)
   }
