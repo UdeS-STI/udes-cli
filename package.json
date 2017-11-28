@@ -6,6 +6,7 @@
         "@udes/bower-locker": "^1.0.6",
         "bower": "^1.8.2",
         "eslint-config-udes": "^0.1.6",
+        "htmlhint": "^0.9.13",
         "polymer-cli": "^1.5.7",
         "shelljs": "^0.7.8",
         "udes-logger": "^0.2.0",
