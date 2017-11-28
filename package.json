@@ -1,6 +1,6 @@
 {
     "name": "udes-cli",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "description": "CLI tools used at UdeS",
     "dependencies": {
         "@udes/bower-locker": "^1.0.6",
@@ -10,7 +10,7 @@
         "polymer-cli": "^1.5.7",
         "shelljs": "^0.7.8",
         "udes-logger": "^0.2.0",
-        "uglify-es": "^3.1.8",
+        "uglify-es": "^3.2.0",
         "update-notifier": "^2.3.0",
         "yargs": "^10.0.3"
     },
