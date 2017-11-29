@@ -1,6 +1,6 @@
 import fs from 'fs'
-import shell from 'shelljs'
 import yargs from 'yargs'
+import ShellJSNodeCLI from '@udes/shelljs-nodecli'
 
 /**
  * Class to handle actions related to building a polymer project.
@@ -25,7 +25,7 @@ export default class Lintable {
 
     this.args = this.formatArguments(args || this.argv)
     this.commands = commands
-    this.shell = shell
+    this.shell = ShellJSNodeCLI
   }
 
   /**
@@ -98,7 +98,8 @@ export default class Lintable {
    */
   executeCommand = (type, hasConfig) => {
     if ((this.args.all || this.args[type]) && hasConfig) {
-      this.shell.exec(this.getCommand(this.commands[type]))
+      const command = this.getCommand(this.commands[type])
+      const exec = ShellJSNodeCLI.exec(command)
     } else if (this.args[type] && !hasConfig) {
       throw new Error(`Cannot find ${type} config file`)
     }
