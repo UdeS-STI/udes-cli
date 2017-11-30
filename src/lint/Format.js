@@ -14,7 +14,7 @@ export default class Format extends Lintable {
     super({
       html: () => `eslint ${this.args.path} --ext html --ignore-path .gitignore --fix`,
       js: () => `eslint ${this.args.path} --ext html,js,json --ignore-path .gitignore --fix`,
-      polymer: 'polymer lint --fix',
+      polymer: 'polymer-cli lint --fix',
     }, args)
   }
 }

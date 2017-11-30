@@ -1,4 +1,4 @@
-import shell from 'shelljs'
+import ShellJSNodeCLI from '@udes/shelljs-nodecli'
 import yargs from 'yargs'
 
 /**
@@ -14,7 +14,7 @@ export default class Bower {
     }
 
     this.args = this.formatArguments(args || this.argv)
-    this.shell = shell
+    this.shell = ShellJSNodeCLI
 
     if (!Object.values(Bower.COMMANDS).includes(this.args.command)) {
       throw new Error(`Invalid command: ${this.args.command}`)

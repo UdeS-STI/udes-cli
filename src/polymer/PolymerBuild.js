@@ -1,5 +1,5 @@
 import fs from 'fs'
-import shell from 'shelljs'
+import ShellJSNodeCLI from '@udes/shelljs-nodecli'
 import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
 import { udesLogger as logger } from 'udes-logger'
@@ -255,7 +255,7 @@ export default class PolymerBuild {
    */
   run = () => {
     if (this.args.build) {
-      shell.exec('polymer build')
+      ShellJSNodeCLI.exec('polymer-cli build')
     }
 
     try {
