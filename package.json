@@ -4,7 +4,7 @@
     "description": "CLI tools used at UdeS",
     "dependencies": {
         "@udes/bower-locker": "^1.0.6",
-        "@udes/shelljs-nodecli": "^0.2.0",
+        "@udes/shelljs-nodecli": "^0.2.2",
         "bower": "^1.8.2",
         "eslint-config-udes": "^0.1.6",
         "htmlhint": "^0.9.13",
@@ -24,7 +24,7 @@
         "cross-env": "^5.1.1",
         "mocha": "^4.0.1",
         "nsp": "^3.1.0",
-        "nyc": "^11.3.0",
+        "nyc": "^11.4.0",
         "sinon": "^4.1.2",
         "sinon-chai": "^2.14.0"
     },
