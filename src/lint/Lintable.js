@@ -99,7 +99,7 @@ export default class Lintable {
   executeCommand = (type, hasConfig) => {
     if ((this.args.all || this.args[type]) && hasConfig) {
       const command = this.getCommand(this.commands[type])
-      const exec = ShellJSNodeCLI.exec(command)
+      this.shell.exec(command)
     } else if (this.args[type] && !hasConfig) {
       throw new Error(`Cannot find ${type} config file`)
     }
