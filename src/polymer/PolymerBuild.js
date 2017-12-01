@@ -255,7 +255,7 @@ export default class PolymerBuild {
    */
   run = () => {
     if (this.args.build) {
-      ShellJSNodeCLI.exec('polymer-cli build')
+      ShellJSNodeCLI.exec('polymer build')
     }
 
     try {

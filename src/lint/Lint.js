@@ -14,7 +14,7 @@ export default class Lint extends Lintable {
     super({
       html: () => `htmlhint ${this.args.path}/*/.html --config .htmlhintrc.json`,
       js: () => `eslint ${this.args.path} --ext html,js,json --ignore-path .gitignore`,
-      polymer: 'polymer-cli lint',
+      polymer: 'polymer lint',
     }, args)
   }
 }
