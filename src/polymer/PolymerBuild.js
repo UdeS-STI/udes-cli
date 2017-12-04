@@ -176,10 +176,15 @@ export default class PolymerBuild {
       if (fs.existsSync(source)) {
         logger.info(`Inline the ${source} file`)
         const code = fs.readFileSync(`${source}`).toString()
+        const options = {
+          ecma: 5,
+          mangle: false,
+        }
 
+        const minify = UglifyJS.minify(code, options)
         string = string.replace(
           new RegExp(`<script inline(="")? src="${source}"></script>`),
-          `<script>${UglifyJS.minify(code).code}</script>`
+          `<script>${minify.code}</script>`
         )
       } else {
         logger.warn(`The ${source} file could not be inlined`)
