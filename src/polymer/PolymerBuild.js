@@ -1,6 +1,6 @@
 import fs from 'fs'
 import ShellJSNodeCLI from '@udes/shelljs-nodecli'
-import UglifyJS from 'uglify-es'
+import UglifyES from 'uglify-es'
 import yargs from 'yargs'
 import { udesLogger as logger } from 'udes-logger'
 
@@ -175,11 +175,19 @@ export default class PolymerBuild {
 
       if (fs.existsSync(source)) {
         logger.info(`Inline the ${source} file`)
-        const code = fs.readFileSync(`${source}`).toString()
 
+        const code = fs.readFileSync(`${source}`).toString()
+        const options = {
+          compress : {
+            collapse_vars: false,
+            reduce_vars: false,
+          },
+        }
+
+        const minify = UglifyES.minify(code, options)
         string = string.replace(
           new RegExp(`<script inline(="")? src="${source}"></script>`),
-          `<script>${UglifyJS.minify(code).code}</script>`
+          `<script>${minify.code}</script>`
         )
       } else {
         logger.warn(`The ${source} file could not be inlined`)
