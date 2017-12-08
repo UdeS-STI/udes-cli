@@ -1,6 +1,5 @@
 import fs from 'fs'
 import ShellJSNodeCLI from '@udes/shelljs-nodecli'
-import UglifyJS from 'uglify-es'
 import yargs from 'yargs'
 import { udesLogger as logger } from 'udes-logger'
 
@@ -157,39 +156,6 @@ export default class PolymerBuild {
   )
 
   /**
-   * Replace script tags with inline JavaScript.
-   * @param {String} html - HTML string.
-   * @returns {string} HTML with replaced base tag.
-   */
-  inlineJs = (html) => {
-    const SOURCE_MATCH = 2
-    const regex = /<script inline(="")? src="([\w/~-]+.js)"><\/script>/g
-    const getInlineTag = string => regex.exec(string)
-
-    let string = html
-    let match = getInlineTag(string)
-
-    while (match) {
-      const source = match[SOURCE_MATCH]
-      match = getInlineTag(string)
-
-      if (fs.existsSync(source)) {
-        logger.info(`Inline the ${source} file`)
-        const code = fs.readFileSync(`${source}`).toString()
-
-        string = string.replace(
-          new RegExp(`<script inline(="")? src="${source}"></script>`),
-          `<script>${UglifyJS.minify(code).code}</script>`
-        )
-      } else {
-        logger.warn(`The ${source} file could not be inlined`)
-      }
-    }
-
-    return string
-  }
-
-  /**
    * Refactor index.html files.
    */
   formatIndexHtml = () => {
@@ -201,7 +167,6 @@ export default class PolymerBuild {
 
     let html = fs.readFileSync(index).toString()
     html = this.modifyMetaBase(html)
-    html = this.inlineJs(html)
 
     fs.writeFileSync(index, html)
   }

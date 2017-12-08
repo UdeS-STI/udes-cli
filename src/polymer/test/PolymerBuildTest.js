@@ -7,7 +7,7 @@ import fs from 'fs'
 import PolymerBuild from './../PolymerBuild'
 
 const buildFiles = ['index.html', 'index.php' ]
-const files = ['htaccess.sample', 'script.js']
+const files = ['htaccess.sample']
 
 const deleteFolderRecursive = (path) => {
   fs.readdirSync(path).forEach((file) => {
@@ -99,9 +99,8 @@ describe('PolymerBuild', () => {
 
       const indexHtml = fs.readFileSync('build/bundled/index.html').toString()
 
-      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
+      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/" /></head><body></body></html>\n')
       expect(fs.existsSync('build/bundled/index.php')).to.be.false
-      expect(fs.existsSync('build/bundled/script.js')).to.be.false
       expect(fs.existsSync('build/bundled/.htaccess')).to.be.false
     })
 
@@ -121,10 +120,9 @@ describe('PolymerBuild', () => {
       const indexPhp = fs.readFileSync('build/bundled/index.php').toString()
       const htaccess = fs.readFileSync('build/bundled/.htaccess').toString()
 
-      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled/" /><script>let hello="world";hello=hello.replace("world","foo");</script></head><body></body></html>\n')
+      expect(indexHtml).to.be.equal('<!DOCTYPE html><html><head><base href="/src/build/bundled/" /></head><body></body></html>\n')
       expect(indexPhp).to.be.equal('<?php echo "This is a PHP file"; ?>\n')
       expect(htaccess).to.be.equal('RewriteBase /src/build/bundled/\n')
-      expect(fs.existsSync('build/bundled/script.js')).to.be.false
     })
   })
 })
