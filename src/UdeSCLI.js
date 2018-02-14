@@ -1,19 +1,17 @@
-import yargs from 'yargs'
-import updateNotifier from 'update-notifier'
+import yargs from 'yargs';
+import updateNotifier from 'update-notifier';
 
-import Bower from './bower/Bower'
-import Format from './lint/Format'
-import Lint from './lint/Lint'
-import PolymerBuild from './polymer/PolymerBuild'
-import pkg from '../package.json'
+import Bower from './bower/Bower';
+import PolymerBuild from './polymer/PolymerBuild';
+import pkg from '../package.json';
 
 /**
  * Dispatch commands to proper class.
  * @class
  */
 export default class UdeSCLI {
-  constructor () {
-    this.checkForUpdateAsync()
+  constructor() {
+    this.checkForUpdateAsync();
   }
 
   /**
@@ -23,7 +21,7 @@ export default class UdeSCLI {
    * @private
    */
   checkForUpdateAsync = () => {
-    updateNotifier({ pkg }).notify({ defer: false })
+    updateNotifier({ pkg }).notify({ defer: false });
   }
 
   /**
@@ -33,13 +31,11 @@ export default class UdeSCLI {
     this.argv = yargs
       .usage('Usage: udes <command> [options]')
       .command('bower', 'Execute bower and bower-locker tasks')
-      .command('format', 'Format files using linting tools')
-      .command('lint', 'Run linting tools for html, js and json files and for polymer projects')
       .command('polymer-build', 'Build a polymer repo for release')
       .help('h')
       .alias('h', 'help')
       .demandCommand()
-      .argv
+      .argv;
   }
 
   /**
@@ -47,27 +43,19 @@ export default class UdeSCLI {
    * @param {String} command - The received command.
    */
   run = (command) => {
-    let commandInstance
+    let commandInstance;
 
     switch (command) {
       case 'bower':
-        commandInstance = new Bower()
-        commandInstance.run()
-        break
-      case 'format':
-        commandInstance = new Format()
-        commandInstance.run()
-        break
-      case 'lint':
-        commandInstance = new Lint()
-        commandInstance.run()
-        break
+        commandInstance = new Bower();
+        commandInstance.run();
+        break;
       case 'polymer-build':
-        commandInstance = new PolymerBuild()
-        commandInstance.run()
-        break
+        commandInstance = new PolymerBuild();
+        commandInstance.run();
+        break;
       default:
-        this.help()
+        this.help();
     }
   }
 }

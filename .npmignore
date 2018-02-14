@@ -9,3 +9,5 @@ coverage
 .eslintrc.js
 .nsprc
 mocha.opts
+.editorconfig
+.eslintignore

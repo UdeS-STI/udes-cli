@@ -1,5 +1,5 @@
-import ShellJSNodeCLI from '@udes/shelljs-nodecli'
-import yargs from 'yargs'
+import ShellJSNodeCLI from '@udes/shelljs-nodecli';
+import yargs from 'yargs';
 
 /**
  * Class to handle actions related to building a polymer project.
@@ -8,35 +8,36 @@ import yargs from 'yargs'
  * @throws {Error} When invalid command is entered.
  */
 export default class Bower {
-  constructor (args) {
+  constructor(args) {
     if (!args) {
-      this.validateArgv()
+      this.validateArgv();
     }
 
-    this.args = this.formatArguments(args || this.argv)
-    this.shell = ShellJSNodeCLI
+    this.args = this.formatArguments(args || this.argv);
+    this.shell = ShellJSNodeCLI;
 
-    if (!Object.values(Bower.COMMANDS).includes(this.args.command)) {
-      throw new Error(`Invalid command: ${this.args.command}`)
+
+    if (!Bower.COMMANDS.includes(this.args.command)) {
+      throw new Error(`Invalid command: ${this.args.command}`);
     }
   }
 
-  static COMMANDS = {
-    INSTALL: 'install',
-    LOCK: 'lock',
-    STATUS: 'status',
-    UNINSTALL: 'uninstall',
-    UNLOCK: 'unlock',
-    UPDATE: 'update',
-    VALIDATE: 'validate',
-  }
+  static COMMANDS = [
+    'install',
+    'lock',
+    'status',
+    'uninstall',
+    'unlock',
+    'update',
+    'validate',
+  ]
 
   /**
    * Execute bower tasks.
    * @public
    */
   run = () => {
-    this[this.args.command](this.args.packageName)
+    this[this.args.command](this.args.packageName);
   }
 
   /**
@@ -50,7 +51,7 @@ export default class Bower {
           .positional('command', {
             describe: 'bower command to execute',
             type: 'string',
-            choices: Object.values(Bower.COMMANDS),
+            choices: Bower.COMMANDS,
           })
           .positional('package', {
             describe: 'package(s) to install',
@@ -60,13 +61,13 @@ export default class Bower {
             default: [],
             describe: 'options to pass to bower',
             type: 'array',
-          })
+          });
       })
       .usage('Usage: udes bower <command> [package]')
       .describe('Execute bower and bower-locker tasks')
       .alias('h', 'help')
       .help('h')
-      .argv
+      .argv;
   }
 
   /**
@@ -75,14 +76,14 @@ export default class Bower {
    * @param {Object} args - Arguments passed through command line.
    * @returns {Object} Arguments in a formatted object.
    */
-  formatArguments = args => {
-    const [packageName, options] = this.splitArgvIntoOptionsPackage(args)
+  formatArguments = (args) => {
+    const [packageName, options] = this.splitArgvIntoOptionsPackage(args);
 
     return {
       command: args.command,
       options,
       packageName,
-    }
+    };
   }
 
   /**
@@ -91,20 +92,20 @@ export default class Bower {
    * @param {Object} args - Arguments passed through command line.
    * @returns {Array} Array of [options, packageName].
    */
-  splitArgvIntoOptionsPackage = args => {
+  splitArgvIntoOptionsPackage = (args) => {
     if (this.argv) {
-      const COMMAND_ARGUMENTS = 4
+      const COMMAND_ARGUMENTS = 4;
 
       return process.argv.reduce((options, argv, index) => {
         if (index > COMMAND_ARGUMENTS) {
-          options[/^-/.test(argv) ? 1 : 0].push(argv)
+          options[/^-/.test(argv) ? 1 : 0].push(argv);
         }
 
-        return options
-      }, [[], []])
+        return options;
+      }, [[], []]);
     }
 
-    return [args.package, args.options || []]
+    return [args.package, args.options || []];
   }
 
   /**
@@ -114,11 +115,11 @@ export default class Bower {
    * @param {[String]} [packageNames=[]] - Packages affected.
    */
   bowerExecute = (command, packageNames = []) => {
-    const args = [...packageNames, ...this.args.options]
+    const args = [...packageNames, ...this.args.options];
 
-    this.unlock()
-    this.shell.exec(`bower ${command} ${args.join(' ')}`.trim())
-    this.lock()
+    this.unlock();
+    this.shell.exec(`bower ${command} ${args.join(' ')}`.trim());
+    this.lock();
   }
 
   /**
@@ -127,7 +128,7 @@ export default class Bower {
    * @param {[String]} [packageNames] - Packages to install.
    */
   install = (packageNames = []) => {
-    this.bowerExecute('install', packageNames)
+    this.bowerExecute('install', packageNames);
   }
 
   /**
@@ -135,7 +136,7 @@ export default class Bower {
    * @private
    */
   lock = () => {
-    this.shell.exec('bower-locker lock')
+    this.shell.exec('bower-locker lock');
   }
 
   /**
@@ -143,7 +144,7 @@ export default class Bower {
    * @private
    */
   status = () => {
-    this.shell.exec('bower-locker status')
+    this.shell.exec('bower-locker status');
   }
 
   /**
@@ -152,7 +153,7 @@ export default class Bower {
    * @param {[String]} [packageNames] - Packages to uninstall.
    */
   uninstall = (packageNames = []) => {
-    this.bowerExecute('uninstall', packageNames)
+    this.bowerExecute('uninstall', packageNames);
   }
 
   /**
@@ -160,7 +161,7 @@ export default class Bower {
    * @private
    */
   unlock = () => {
-    this.shell.exec('bower-locker unlock')
+    this.shell.exec('bower-locker unlock');
   }
 
   /**
@@ -169,7 +170,7 @@ export default class Bower {
    * @param {[String]} [packageNames] - Packages to update.
    */
   update = (packageNames = []) => {
-    this.bowerExecute('update', packageNames)
+    this.bowerExecute('update', packageNames);
   }
 
   /**
@@ -177,6 +178,6 @@ export default class Bower {
    * @private
    */
   validate = () => {
-    this.shell.exec('bower-locker validate')
+    this.shell.exec('bower-locker validate');
   }
 }
