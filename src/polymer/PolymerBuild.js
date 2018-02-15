@@ -1,7 +1,7 @@
-import fs from 'fs'
-import ShellJSNodeCLI from '@udes/shelljs-nodecli'
-import yargs from 'yargs'
-import { udesLogger as logger } from 'udes-logger'
+import fs from 'fs';
+import ShellJSNodeCLI from '@udes/shelljs-nodecli';
+import yargs from 'yargs';
+import { udesLogger as logger } from 'udes-logger';
 
 /**
  * Get build names from polymer config file.
@@ -9,7 +9,7 @@ import { udesLogger as logger } from 'udes-logger'
  * @returns {[String]} List of build names.
  */
 const getDefaultBuildNames = () =>
-  JSON.parse(fs.readFileSync('polymer.json')).builds.map(({ name, preset }) => name || preset)
+  JSON.parse(fs.readFileSync('polymer.json')).builds.map(({ name, preset }) => name || preset);
 
 /**
  * Converts command line arguments into a usable object.
@@ -18,7 +18,7 @@ const getDefaultBuildNames = () =>
  * @returns {Object} Arguments in a formatted object.
  */
 const formatArguments = (args) => {
-  const dir = 'build/'
+  const dir = 'build/';
   const {
     addBuildDir = false,
     addBuildName = false,
@@ -26,10 +26,10 @@ const formatArguments = (args) => {
     build = true,
     buildNames = getDefaultBuildNames(),
     copyHtaccessSample = false,
-  } = args
+  } = args;
 
   if (copyHtaccessSample) {
-    logger.debug('.htaccess Rewrite without build directory: true')
+    logger.debug('.htaccess Rewrite without build directory: true');
   }
 
   return {
@@ -40,8 +40,8 @@ const formatArguments = (args) => {
     buildNames: (Array.isArray(buildNames)) ? buildNames : [buildNames],
     copyHtaccessSample,
     dir,
-  }
-}
+  };
+};
 
 /**
  * Class to handle actions related to building a polymer project.
@@ -55,17 +55,19 @@ const formatArguments = (args) => {
  * @param {Boolean} [args.copyHtaccessSample=false] - Copy of htaccess for build dir if true.
  */
 export default class PolymerBuild {
-  constructor (args) {
+  constructor(args) {
     if (!args) {
-      this.validateArgv()
+      this.validateArgv();
     } else if (!args.baseURI) {
-      throw Error('Please provide baseURI argument to work with this build')
+      throw Error('Please provide baseURI argument to work with this build');
     }
 
-    this.args = formatArguments(args || this.argv)
+    this.args = formatArguments(args || this.argv);
 
     if (!this.__isValidBaseURI(this.args.baseURI)) {
-      throw Error(`Invalid argument baseURI (${this.args.baseURI}). Please use '/path/to/use/' or 'http://exemple.com/' format`)
+      throw Error(
+        `Invalid argument baseURI (${this.args.baseURI}). Please use '/path/to/use/' or 'http://exemple.com/' format`
+      );
     }
   }
 
@@ -75,8 +77,8 @@ export default class PolymerBuild {
    * @param {String} baseURI - Base URI.
    * @return {Boolean} True if the baseURI is valid.
    */
-  __isValidBaseURI (baseURI) {
-    return (/^((\/|\w+:\/{2}).+)?\/$/.test(baseURI))
+  __isValidBaseURI(baseURI) {
+    return (/^((\/|\w+:\/{2}).+)?\/$/.test(baseURI));
   }
 
   /**
@@ -118,7 +120,7 @@ export default class PolymerBuild {
       .array('buildNames')
       .demandOption(['baseURI'], 'Please provide -baseURI argument to work with this build')
       .help('h')
-      .argv
+      .argv;
   }
 
   /**
@@ -126,23 +128,23 @@ export default class PolymerBuild {
    * directory and replace RewriteBase entry.
    */
   formatHtaccess = () => {
-    const sampleFile = 'htaccess.sample'
-    logger.info(`Copy of ${sampleFile} to ${this.buildDir}.htaccess ...`)
+    const sampleFile = 'htaccess.sample';
+    logger.info(`Copy of ${sampleFile} to ${this.buildDir}.htaccess ...`);
 
     if (!fs.existsSync(sampleFile)) {
-      throw Error(`${sampleFile} file not found`)
+      throw Error(`${sampleFile} file not found`);
     }
 
-    let sample = fs.readFileSync(sampleFile).toString()
+    let sample = fs.readFileSync(sampleFile).toString();
 
     sample = sample.replace(
       /RewriteBase[\s]+.*/,
       `RewriteBase ${this.baseURL}`
-    )
+    );
 
-    fs.writeFileSync(`${this.buildDir}/.htaccess`, sample)
+    fs.writeFileSync(`${this.buildDir}/.htaccess`, sample);
 
-    logger.info('Copy completed!')
+    logger.info('Copy completed!');
   }
 
   /**
@@ -159,16 +161,16 @@ export default class PolymerBuild {
    * Refactor index.html files.
    */
   formatIndexHtml = () => {
-    const index = `${this.buildDir}/index.html`
+    const index = `${this.buildDir}/index.html`;
 
     if (!fs.existsSync(index)) {
-      throw Error(`${index} file not found`)
+      throw Error(`${index} file not found`);
     }
 
-    let html = fs.readFileSync(index).toString()
-    html = this.modifyMetaBase(html)
+    let html = fs.readFileSync(index).toString();
+    html = this.modifyMetaBase(html);
 
-    fs.writeFileSync(index, html)
+    fs.writeFileSync(index, html);
   }
 
   /**
@@ -176,7 +178,7 @@ export default class PolymerBuild {
    */
   removeIndexPhp = () => {
     if (fs.existsSync(`${this.buildDir}/index.php`)) {
-      fs.unlinkSync(`${this.buildDir}/index.php`)
+      fs.unlinkSync(`${this.buildDir}/index.php`);
     }
   }
 
@@ -191,9 +193,9 @@ export default class PolymerBuild {
       addBuildName,
       baseURI,
       dir,
-    } = this.args
+    } = this.args;
 
-    return `${baseURI}${addBuildDir ? dir : ''}${addBuildName ? `${buildName}/` : ''}`
+    return `${baseURI}${addBuildDir ? dir : ''}${addBuildName ? `${buildName}/` : ''}`;
   }
 
   /**
@@ -201,17 +203,17 @@ export default class PolymerBuild {
    * @param {String} buildName - Build name from arguments or polymer config.
    */
   updateBuildFiles = (buildName) => {
-    this.baseURL = this.getBaseURL(buildName)
-    this.buildDir = `${this.args.dir}${buildName}/`
+    this.baseURL = this.getBaseURL(buildName);
+    this.buildDir = `${this.args.dir}${buildName}/`;
 
-    logger.info(`Build directory: ${this.buildDir}`)
+    logger.info(`Build directory: ${this.buildDir}`);
 
-    this.formatIndexHtml()
+    this.formatIndexHtml();
 
     if (this.args.copyHtaccessSample) {
-      this.formatHtaccess()
+      this.formatHtaccess();
     } else {
-      this.removeIndexPhp()
+      this.removeIndexPhp();
     }
   }
 
@@ -220,13 +222,13 @@ export default class PolymerBuild {
    */
   run = () => {
     if (this.args.build) {
-      ShellJSNodeCLI.exec('polymer build')
+      ShellJSNodeCLI.exec('polymer build');
     }
 
     try {
-      this.args.buildNames.forEach(this.updateBuildFiles)
+      this.args.buildNames.forEach(this.updateBuildFiles);
     } catch (error) {
-      logger.error(error.toString())
+      logger.error(error.toString());
     }
   }
 }
