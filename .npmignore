@@ -7,7 +7,6 @@ src
 coverage
 .babelrc
 .eslintrc.js
-.nsprc
 mocha.opts
 .editorconfig
 .eslintignore
