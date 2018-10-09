@@ -3,11 +3,11 @@
   "version": "0.6.2",
   "description": "CLI tools used at UdeS",
   "dependencies": {
-    "@udes/bower-locker": "^1.0.6",
+    "@udes/bower-locker": "^1.1.0",
     "@udes/shelljs-nodecli": "^0.2.3",
     "udes-logger": "^0.2.0",
-    "update-notifier": "^2.3.0",
-    "yargs": "^11.0.0"
+    "update-notifier": "^2.5.0",
+    "yargs": "^12.0.2"
   },
   "peerDependencies": {
     "bower": "^1.8.2",
@@ -15,32 +15,24 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.1",
+    "babel-eslint": "^10.0.1",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "chai": "^4.1.2",
-    "cross-env": "^5.1.3",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "eslint-config-udes": "^0.2.1",
-    "mocha": "^5.0.1",
-    "npm-run-all": "^4.1.2",
+    "mocha": "^5.2.0",
     "nsp": "^3.2.1",
-    "nyc": "^11.5.0",
-    "sinon": "^4.3.0",
-    "sinon-chai": "^2.14.0"
+    "nyc": "^13.0.1",
+    "sinon": "^6.3.5",
+    "sinon-chai": "^3.2.0"
   },
   "scripts": {
-    "audit": "nsp check",
     "build": "babel ./src --out-dir dist --ignore '**/*Test.js' --ignore '**/test/**'",
     "coverage": "cross-env NODE_ENV=test NOLOG=true node_modules/.bin/nyc --require babel-core/register -x '**/**Test.js' node_modules/.bin/mocha --opts ../mocha.opts \\ ./src/**/**Test.js",
-    "format": "npm-run-all format:*",
-    "format:js": "eslint . --ext js --fix",
-    "format:json": "eslint . --ext json --fix",
-    "format:markdown": "eslint . --ext md --fix",
-    "lint": "npm-run-all lint:*",
-    "lint:js": "eslint . --ext js",
-    "lint:json": "eslint . --ext json",
-    "lint:markdown": "eslint . --ext md",
+    "format": "eslint . --ext js,json,md --fix",
+    "lint": "eslint . --ext js,json,md",
     "prepublishOnly": "npm run test && npm run build",
     "test": "cross-env NODE_ENV=test NOLOG=true mocha --require babel-core/register --opts ../mocha.opts ./src/**/**Test.js"
   },
