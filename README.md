@@ -5,7 +5,6 @@ UdeS CLI
 [![CircleCI](https://circleci.com/gh/UdeS-STI/udes-cli.svg?style=svg)](https://circleci.com/gh/UdeS-STI/udes-cli)
 [![npm](https://img.shields.io/npm/v/udes-cli.svg?style=flat-square)](https://www.npmjs.com/package/udes-cli)
 ![Node](https://img.shields.io/badge/node-6.10.1-brightgreen.svg)
-[![NSP Status](https://nodesecurity.io/orgs/udes-sti/projects/a84effa1-1302-420c-92fa-c7d772a60833/badge)](https://nodesecurity.io/orgs/udes-sti/projects/a84effa1-1302-420c-92fa-c7d772a60833)
 
 # Introduction
 This package contains Command Line Interface tools for automated certain

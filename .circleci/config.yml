@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/udes-cli
     docker:
-      - image: circleci/node:6.10
+      - image: circleci/node:10
     steps:
       - checkout
       - restore_cache:
@@ -24,7 +24,7 @@ jobs:
           command: npm run lint
       - run:
           name: security-audit
-          command: npm run audit
+          command: npm audit
       - run:
           name: unit-tests
           command: npm run test
